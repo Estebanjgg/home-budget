@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Home Budget - Presupuesto Familiar 💰
 
-## Getting Started
+Una aplicación web moderna para gestionar el presupuesto familiar de manera inteligente, construida con Next.js 15, TypeScript, Tailwind CSS y Supabase.
 
-First, run the development server:
+## 🚀 Características
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### ✅ Implementadas
+- **Autenticación completa** con Supabase
+  - Registro de usuarios
+  - Inicio de sesión
+  - Recuperación de contraseña
+  - Gestión de sesiones
+- **Perfil de usuario**
+  - Cambio de contraseña
+  - Subida de avatar
+  - Menú desplegable elegante
+- **Dashboard inicial** con tarjetas de resumen
+- **Diseño responsive** con Tailwind CSS
+
+### 🔄 Próximas funcionalidades
+- Gestión de ingresos y gastos
+- Categorización de transacciones
+- Reportes y gráficos
+- Metas de ahorro
+- Recordatorios de pagos
+
+## 🛠️ Tecnologías
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Estilos**: Tailwind CSS 4
+- **Base de datos**: Supabase
+- **Autenticación**: Supabase Auth
+- **Storage**: Supabase Storage (para avatars)
+
+## 📋 Requisitos previos
+
+- Node.js 18+ 
+- npm o yarn
+- Cuenta en [Supabase](https://supabase.com)
+
+## 🚀 Instalación
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone <tu-repositorio>
+   cd home-budget
+   ```
+
+2. **Instalar dependencias**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar variables de entorno**
+   
+   El archivo `.env.local` ya está configurado con las credenciales de Supabase.
+
+4. **Configurar Supabase**
+   
+   Ejecuta el contenido del archivo `supabase-setup.sql` en el SQL Editor de tu panel de Supabase para:
+   - Crear el bucket de avatars
+   - Configurar las políticas de seguridad
+
+5. **Ejecutar la aplicación**
+   ```bash
+   npm run dev
+   ```
+
+6. **Abrir en el navegador**
+   
+   Visita [http://localhost:3000](http://localhost:3000)
+
+## 📁 Estructura del proyecto
+
+```
+home-budget/
+├── app/                    # App Router de Next.js
+│   ├── layout.tsx         # Layout principal
+│   └── page.tsx           # Página principal
+├── components/            # Componentes React
+│   ├── Auth.tsx          # Componente de autenticación
+│   ├── UserMenu.tsx      # Menú desplegable del usuario
+│   └── UserProfile.tsx   # Modal de perfil de usuario
+├── hooks/                 # Hooks personalizados
+│   └── useAuth.ts        # Hook para manejo de autenticación
+├── lib/                   # Utilidades y configuraciones
+│   └── supabase.ts       # Cliente de Supabase
+├── .env.local            # Variables de entorno
+└── supabase-setup.sql    # Script de configuración de Supabase
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Configuración de Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Crear proyecto en Supabase
+1. Ve a [supabase.com](https://supabase.com)
+2. Crea una nueva cuenta o inicia sesión
+3. Crea un nuevo proyecto
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Configurar Storage
+Ejecuta el siguiente SQL en el SQL Editor de Supabase:
 
-## Learn More
+```sql
+-- Crear bucket para avatars
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true);
 
-To learn more about Next.js, take a look at the following resources:
+-- Políticas de seguridad (ver supabase-setup.sql para el código completo)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎯 Uso de la aplicación
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Para nuevos usuarios:
+1. Haz clic en "¿No tienes cuenta? Regístrate"
+2. Ingresa tu email y contraseña
+3. Confirma tu cuenta desde el email recibido
+4. Inicia sesión
 
-## Deploy on Vercel
+### Para usuarios existentes:
+1. Ingresa tu email y contraseña
+2. Haz clic en "Iniciar Sesión"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Gestión de perfil:
+1. Haz clic en tu avatar/email en la esquina superior derecha
+2. Selecciona "Mi Perfil"
+3. Cambia tu contraseña, sube un avatar o cierra sesión
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Seguridad
+
+- Las contraseñas se manejan de forma segura con Supabase Auth
+- Los avatars se almacenan en Supabase Storage con políticas de seguridad
+- Las sesiones se gestionan automáticamente
+- Variables de entorno para credenciales sensibles
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 📞 Soporte
+
+Si tienes alguna pregunta o problema, por favor abre un issue en el repositorio.
+
+---
+
+**¡Gracias por usar Home Budget! 🏠💰**

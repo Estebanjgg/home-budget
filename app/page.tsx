@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import Auth from '@/components/Auth'
 import UserProfile from '@/components/UserProfile'
 import UserMenu from '@/components/UserMenu'
+import { BudgetDashboard } from '@/components/BudgetDashboard'
 
 export default function Home() {
   const { user, loading } = useAuth()
@@ -34,9 +35,7 @@ export default function Home() {
             playsInline
           >
             <source src="/video/Jun_30__1252_16s_202506301308_zeh4h.mp4" type="video/mp4" />
-            {/* Fallback para navegadores que no soporten el video */}
           </video>
-          {/* Overlay gradient for better readability */}
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
         
@@ -48,26 +47,37 @@ export default function Home() {
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl mb-6 sm:mb-8 border border-white/20">
+          <div className="text-center mb-16">
+            <div className="mb-8">
               <img 
                 src="/logo-aplicativo/logo_esteban.png" 
                 alt="Home Budget Logo" 
-                className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 object-contain"
+                className="h-20 w-auto mx-auto mb-6 drop-shadow-lg"
               />
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl px-4 py-2 sm:px-8 sm:py-4 border border-white/20 shadow-2xl mb-3 sm:mb-4 mx-auto max-w-fit">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
-                Home Budget
-              </h1>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl px-4 py-2 sm:px-6 sm:py-3 border border-white/20 shadow-xl mx-auto max-w-fit">
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed drop-shadow-md max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl">
-                Gestiona tu presupuesto familiar de manera inteligente y toma control total de tus finanzas
-              </p>
+            <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
+              Home Budget
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed drop-shadow">
+              Toma el control de tus finanzas personales con nuestra plataforma inteligente de presupuestos
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 text-white/80 text-lg">
+              <div className="flex items-center">
+                <span className="mr-2">💰</span>
+                <span>Gestión de Ingresos</span>
+              </div>
+              <div className="flex items-center">
+                <span className="mr-2">📊</span>
+                <span>Control de Gastos</span>
+              </div>
+              <div className="flex items-center">
+                <span className="mr-2">🎯</span>
+                <span>Metas de Ahorro</span>
+              </div>
             </div>
           </div>
-          <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto">
+          
+          <div className="max-w-md mx-auto">
             <Auth />
           </div>
         </div>
@@ -76,119 +86,38 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Home Budget
-            </h1>
-            <div className="flex items-center space-x-4">
-              <span className="hidden md:block text-gray-700">Bienvenido</span>
-              <UserMenu 
-                user={user} 
-                onProfileClick={() => setShowProfile(true)} 
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <img 
+                src="/logo-aplicativo/logo_esteban.png" 
+                alt="Home Budget" 
+                className="h-8 w-auto mr-3"
               />
+              <h1 className="text-xl font-bold text-gray-800">Home Budget</h1>
             </div>
+            <UserMenu 
+              user={user} 
+              onProfileClick={() => setShowProfile(true)}
+            />
           </div>
         </div>
       </header>
 
+      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Dashboard Cards */}
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">$</span>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Ingresos del Mes
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      $0.00
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">-</span>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Gastos del Mes
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      $0.00
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">=</span>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Balance
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      $0.00
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Próximas Funcionalidades
-              </h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>• Agregar ingresos y gastos</li>
-                <li>• Categorizar transacciones</li>
-                <li>• Reportes y gráficos</li>
-                <li>• Metas de ahorro</li>
-                <li>• Recordatorios de pagos</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        {showProfile ? (
+          <UserProfile 
+            user={user} 
+            onClose={() => setShowProfile(false)}
+          />
+        ) : (
+          <BudgetDashboard />
+        )}
       </main>
-      
-      {/* Modal de Perfil */}
-      {showProfile && (
-        <UserProfile 
-          user={user} 
-          onClose={() => setShowProfile(false)} 
-        />
-      )}
     </div>
   )
 }

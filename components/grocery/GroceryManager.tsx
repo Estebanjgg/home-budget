@@ -48,6 +48,45 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const [viewMode, setViewMode] = useState<'cards' | 'detail'>('cards');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [monthToDelete, setMonthToDelete] = useState<{id: string, name: string} | null>(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentMonth || !selectedStoreId || !newProduct.name.trim()) return;
+
+    setIsAddingProduct(true);
+    
+    try {
+      const item = await addItem(
+        currentMonth.id,
+        selectedStoreId,
+        newProduct.name.trim(),
+        newProduct.quantity,
+        newProduct.price
+      );
+
+      if (item) {
+        // Limpiar formulario
+        setNewProduct({ name: '', quantity: 1, price: 0, notes: '', priority: 2 });
+        setSelectedStoreId('');
+        
+        // Mostrar mensaje de éxito
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 3000);
+        
+        // Scroll suave hacia el área de productos para ver el nuevo item
+        const productSection = document.getElementById('products-section');
+        if (productSection) {
+          productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    } catch (error) {
+      console.error('Error al agregar producto:', error);
+    } finally {
+      setIsAddingProduct(false);
+    }
+  };
 
   const handleCreateMonth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,24 +111,6 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     if (store) {
       setNewStoreName('');
       setShowCreateStore(false);
-    }
-  };
-
-  const handleAddProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentMonth || !selectedStoreId || !newProduct.name.trim()) return;
-
-    const item = await addItem(
-      currentMonth.id,
-      selectedStoreId,
-      newProduct.name.trim(),
-      newProduct.quantity,
-      newProduct.price
-    );
-
-    if (item) {
-      setNewProduct({ name: '', quantity: 1, price: 0, notes: '', priority: 2 });
-      setSelectedStoreId('');
     }
   };
 
@@ -433,12 +454,14 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       {monthSummary && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Resumen del Mes</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          
+          {/* Resumen general */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {monthSummary.stores.reduce((total, store) => total + store.items.length, 0)}
               </div>
-              <div className="text-sm text-gray-600">Total</div>
+              <div className="text-sm text-gray-600">Total Items</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
@@ -458,7 +481,84 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">${monthSummary.grandTotal.toFixed(2)}</div>
-              <div className="text-sm text-gray-600">Total $</div>
+              <div className="text-sm text-gray-600">Total General</div>
+            </div>
+          </div>
+
+          {/* Resumen por supermercado */}
+          <div className="border-t pt-4">
+            <h3 className="text-md font-semibold text-gray-800 mb-3">Balance por Supermercado</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {monthSummary.stores.map((store) => {
+                const storeItemCount = store.items.length;
+                const storePurchasedCount = store.items.filter(item => item.purchased).length;
+                const storePendingCount = store.items.filter(item => !item.purchased).length;
+                const storeTotal = store.total || store.items.reduce((sum, item) => sum + item.total_amount, 0);
+                
+                return (
+                  <div key={store.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-800 truncate">{store.name}</h4>
+                      <span className="text-lg">🏪</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Total Items:</span>
+                        <span className="font-medium text-blue-600">{storeItemCount}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Comprados:</span>
+                        <span className="font-medium text-green-600">{storePurchasedCount}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Pendientes:</span>
+                        <span className="font-medium text-orange-600">{storePendingCount}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+                        <span className="text-sm font-semibold text-gray-700">Total Gastado:</span>
+                        <span className="font-bold text-purple-600">${storeTotal.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Resumen final de todos los supermercados */}
+            <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h4 className="font-semibold text-gray-800">Resumen Total de Supermercados</h4>
+                  <p className="text-sm text-gray-600">Balance consolidado de todos los supermercados</p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 text-center">
+                  <div>
+                    <div className="text-lg font-bold text-blue-600">
+                      {monthSummary.stores.length}
+                    </div>
+                    <div className="text-xs text-gray-600">Supermercados</div>
+                  </div>
+                  
+                  <div>
+                    <div className="text-lg font-bold text-green-600">
+                      {monthSummary.stores.reduce((total, store) => total + store.items.length, 0)}
+                    </div>
+                    <div className="text-xs text-gray-600">Items Totales</div>
+                  </div>
+                  
+                  <div>
+                    <div className="text-xl font-bold text-purple-600">
+                      ${monthSummary.grandTotal.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-gray-600">Monto Total</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -495,59 +595,144 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
         
         {/* Formulario para agregar producto */}
         <form onSubmit={handleAddProduct} className="border-t pt-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Agregar Producto</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            <select
-              value={selectedStoreId}
-              onChange={(e) => setSelectedStoreId(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            >
-              <option value="">Seleccionar supermercado</option>
-              {stores.map((store) => (
-                <option key={store.id} value={store.id}>
-                  {store.name}
-                </option>
-              ))}
-            </select>
-            
-            <input
-              type="text"
-              placeholder="Nombre del producto"
-              value={newProduct.name}
-              onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-            
-            <input
-              type="number"
-              placeholder="Cantidad"
-              min="1"
-              value={newProduct.quantity}
-              onChange={(e) => setNewProduct({ ...newProduct, quantity: parseInt(e.target.value) || 1 })}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-            
-            <input
-              type="number"
-              placeholder="Precio"
-              min="0"
-              step="0.01"
-              value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) || 0 })}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-            
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Agregar
-            </button>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-gray-800">Agregar Producto</h3>
+            {showSuccessMessage && (
+              <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1 rounded-lg border border-green-200 animate-pulse">
+                <span>✅</span>
+                <span className="text-sm font-medium">¡Producto agregado!</span>
+              </div>
+            )}
           </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Supermercado
+              </label>
+              <select
+                value={selectedStoreId}
+                onChange={(e) => setSelectedStoreId(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+                disabled={isAddingProduct}
+              >
+                <option value="">Seleccionar supermercado</option>
+                {stores.map((store) => (
+                  <option key={store.id} value={store.id}>
+                    {store.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre del Producto
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: Leche, Pan, Arroz..."
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+                disabled={isAddingProduct}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cantidad
+              </label>
+              <input
+                type="number"
+                placeholder="1"
+                min="1"
+                step="1"
+                value={newProduct.quantity === 1 ? '' : newProduct.quantity}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setNewProduct({ ...newProduct, quantity: 1 });
+                  } else {
+                    const numValue = parseInt(value);
+                    setNewProduct({ ...newProduct, quantity: numValue > 0 ? numValue : 1 });
+                  }
+                }}
+                onFocus={(e) => {
+                  if (newProduct.quantity === 1) {
+                    e.target.select();
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+                disabled={isAddingProduct}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Precio Unitario ($)
+              </label>
+              <input
+                type="number"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                value={newProduct.price === 0 ? '' : newProduct.price}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setNewProduct({ ...newProduct, price: 0 });
+                  } else {
+                    const numValue = parseFloat(value);
+                    setNewProduct({ ...newProduct, price: numValue >= 0 ? numValue : 0 });
+                  }
+                }}
+                onFocus={(e) => {
+                  if (newProduct.price === 0) {
+                    e.target.select();
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+                disabled={isAddingProduct}
+              />
+            </div>
+            
+            <div className="flex items-end">
+              <button
+                type="submit"
+                disabled={isAddingProduct}
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+              >
+                {isAddingProduct ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>Agregando...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>➕</span>
+                    <span>Agregar</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          {/* Mostrar total calculado */}
+          {(newProduct.quantity > 0 && newProduct.price > 0) && (
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-blue-700">Total calculado:</span>
+                <span className="font-bold text-blue-800">
+                  ${(newProduct.quantity * newProduct.price).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
         </form>
       </div>
       

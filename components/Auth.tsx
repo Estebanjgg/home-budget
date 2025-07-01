@@ -83,11 +83,20 @@ export default function Auth() {
         if (error) throw error
         setMessage('¡Inicio de sesión exitoso!')
       } else if (mode === 'register') {
-        const { error } = await supabase.auth.signUp({
+        // Proceder directamente con el registro
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         })
+        
         if (error) throw error
+        
+        // Si el usuario ya existe, Supabase retorna un usuario pero sin sesión
+        // y con identities vacío
+        if (data.user && !data.session && data.user.identities?.length === 0) {
+          throw new Error('Este email ya está registrado. Por favor, Registrese con otro email.')
+        }
+        
         setMessage('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.')
       } else if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email)

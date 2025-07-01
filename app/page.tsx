@@ -2,14 +2,15 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import Auth from '@/components/Auth'
-import UserProfile from '@/components/UserProfile'
-import { Navbar } from '@/components/Navbar'
+import Auth from '@/components/auth/Auth'
+import UserProfile from '@/components/user/UserProfile'
+import { Navbar } from '@/components/layout/Navbar'
 import { Dashboard } from '@/components/Dashboard'
-import { BudgetManager } from '@/components/BudgetManager'
-import { Footer } from '../components/Footer'
-import GroceryManager from '@/components/GroceryManager'
-import { EducationAdmin } from '@/components/EducationAdmin'
+import { BudgetManager } from '@/components/budget/BudgetManager'
+import { Footer } from '../components/layout/Footer'
+import GroceryManager from '@/components/grocery/GroceryManager'
+import { EducationAdmin } from '@/components/education/EducationAdmin'
+
 
 export default function Home() {
   const { user, loading } = useAuth()

@@ -4,8 +4,8 @@ import type { User } from '@supabase/supabase-js'
 
 interface NavbarProps {
   user: User
-  activeTab: 'dashboard' | 'budgets'
-  onTabChange: (tab: 'dashboard' | 'budgets') => void
+  activeTab: 'dashboard' | 'budgets' | 'grocery'
+  onTabChange: (tab: 'dashboard' | 'budgets' | 'grocery') => void
   onProfileClick: () => void
 }
 
@@ -73,6 +73,17 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
               {activeTab === 'budgets' && (
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-xl opacity-20 animate-pulse"></div>
               )}
+            </button>
+            <button
+              onClick={() => onTabChange('grocery')}
+              className={`px-3 py-2 sm:px-6 sm:py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
+                activeTab === 'grocery'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-purple-100 hover:to-pink-100 hover:text-purple-700'
+              }`}
+            >
+              <span className="hidden sm:inline">🛒 Mis Gastos Supermercado</span>
+              <span className="sm:hidden">🛒 Supermercado</span>
             </button>
           </div>
           

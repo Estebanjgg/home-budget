@@ -8,11 +8,12 @@ import { Navbar } from '@/components/Navbar'
 import { Dashboard } from '@/components/Dashboard'
 import { BudgetManager } from '@/components/BudgetManager'
 import { Footer } from '../components/Footer'
+import GroceryManager from '@/components/GroceryManager';
 
 export default function Home() {
   const { user, loading } = useAuth()
   const [showProfile, setShowProfile] = useState(false)
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets' | 'grocery'>('dashboard')
 
   if (loading) {
     return (
@@ -136,9 +137,11 @@ export default function Home() {
           />
         ) : activeTab === 'dashboard' ? (
           <Dashboard />
-        ) : (
+        ) : activeTab === 'budgets' ? (
           <BudgetManager />
-        )}
+        ) : activeTab === 'grocery' ? (
+          <GroceryManager onBack={() => setActiveTab('dashboard')} />
+        ) : null}
       </main>
       
       {/* Agregar el footer al final */}

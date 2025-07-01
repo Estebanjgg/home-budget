@@ -8,11 +8,13 @@ import { Navbar } from '@/components/Navbar'
 import { Dashboard } from '@/components/Dashboard'
 import { BudgetManager } from '@/components/BudgetManager'
 import { Footer } from '../components/Footer'
-import GroceryManager from '@/components/GroceryManager';
+import GroceryManager from '@/components/GroceryManager'
+import { EducationAdmin } from '@/components/EducationAdmin'
 
 export default function Home() {
   const { user, loading } = useAuth()
   const [showProfile, setShowProfile] = useState(false)
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets' | 'grocery'>('dashboard')
 
   if (loading) {
@@ -91,13 +93,19 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      {/* Renderizar EducationAdmin si está activo */}
+      {showAdminPanel && (
+        <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+      )}
+
       {/* Navbar unificado que incluye la funcionalidad de Navigation.tsx */}
-      {!showProfile && (
+      {!showProfile && !showAdminPanel && (
         <Navbar 
           user={user}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           onProfileClick={() => setShowProfile(true)}
+          onAdminClick={() => setShowAdminPanel(true)}
         />
       )}
 
@@ -129,23 +137,25 @@ export default function Home() {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {showProfile ? (
-          <UserProfile 
-            user={user} 
-            onClose={() => setShowProfile(false)}
-          />
-        ) : activeTab === 'dashboard' ? (
-          <Dashboard />
-        ) : activeTab === 'budgets' ? (
-          <BudgetManager />
-        ) : activeTab === 'grocery' ? (
-          <GroceryManager onBack={() => setActiveTab('dashboard')} />
-        ) : null}
-      </main>
+      {!showAdminPanel && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {showProfile ? (
+            <UserProfile 
+              user={user} 
+              onClose={() => setShowProfile(false)}
+            />
+          ) : activeTab === 'dashboard' ? (
+            <Dashboard />
+          ) : activeTab === 'budgets' ? (
+            <BudgetManager />
+          ) : activeTab === 'grocery' ? (
+            <GroceryManager onBack={() => setActiveTab('dashboard')} />
+          ) : null}
+        </main>
+      )}
       
       {/* Agregar el footer al final */}
-      <Footer />
+      {!showAdminPanel && <Footer />}
     </div>
   )
 }

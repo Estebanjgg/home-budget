@@ -44,3 +44,30 @@ export interface BudgetSummary {
   remainingBalance: number
   netIncome: number // gross_income - tithe - savings
 }
+
+export interface UserProfile {
+  id: string
+  email: string
+  full_name?: string
+  avatar_url?: string
+  is_admin: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface EducationalContent {
+  id: string
+  title: string
+  summary: string
+  content?: string
+  type: 'article' | 'video'
+  category: string
+  duration: string
+  image_emoji: string
+  url?: string
+  is_featured: boolean
+  is_active: boolean
+  created_by: string
+  created_at: string
+  updated_at: string
+}

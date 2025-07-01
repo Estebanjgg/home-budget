@@ -1,12 +1,32 @@
 import { useState, useEffect } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
+import { useEducationalContent } from '@/hooks/useEducationalContent'
 import { getBudgetItems } from '@/lib/budget-queries'
-import type { BudgetItem, ExpenseCategory } from '@/lib/types'
+import { EducationAdmin } from './EducationAdmin'
+import { FeaturedVideos } from './FeaturedVideos'
+import { VideoPlayer } from './VideoPlayer'
+import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
+
+interface EducationalContentItem {
+  id: string
+  title: string
+  summary: string
+  type: 'article' | 'video'
+  category: string
+  url?: string
+  image_emoji?: string
+  duration?: string
+  read_time?: string
+  is_featured?: boolean
+}
 
 export function Dashboard() {
   const { budgets, loading, error, calculateSummary } = useBudgets()
+  const { content: educationalContent, featuredContent, isAdmin, loading: educationLoading } = useEducationalContent()
   const [dashboardMetrics, setDashboardMetrics] = useState<any>(null)
   const [groceryMetrics, setGroceryMetrics] = useState<any>(null)
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
+  const [selectedVideo, setSelectedVideo] = useState<EducationalContent | null>(null)
 
   // Calcular métricas del dashboard
   const calculateDashboardMetrics = async () => {
@@ -31,7 +51,7 @@ export function Dashboard() {
     let totalGroceries = 0
     let groceryBudgetTotal = 0
 
-    const summaries = await Promise.all(
+    await Promise.all(
       budgets.map(async (budget) => {
         const [summary, items] = await Promise.all([
           calculateSummary(budget.id),
@@ -58,7 +78,6 @@ export function Dashboard() {
           // Presupuesto estimado para supermercado (30% de ingresos como referencia)
           groceryBudgetTotal += (summary.totalIncome || 0) * 0.3
         }
-        return { budget, summary, items }
       })
     )
 
@@ -116,47 +135,15 @@ export function Dashboard() {
     }).format(amount)
   }
 
-  // Datos de noticias financieras (simulados)
-  const financialNews = [
-    {
-      id: 1,
-      title: "10 Estrategias para Ahorrar en el Supermercado",
-      summary: "Descubre cómo reducir tus gastos de alimentación sin sacrificar calidad.",
-      type: "article",
-      readTime: "5 min",
-      category: "Ahorro",
-      image: "🛒"
-    },
-    {
-      id: 2,
-      title: "Cómo Crear un Presupuesto Familiar Efectivo",
-      summary: "Guía paso a paso para organizar tus finanzas familiares.",
-      type: "video",
-      duration: "12 min",
-      category: "Presupuesto",
-      image: "📹"
-    },
-    {
-      id: 3,
-      title: "Inversiones Básicas para Principiantes",
-      summary: "Aprende los fundamentos de la inversión personal.",
-      type: "article",
-      readTime: "8 min",
-      category: "Inversión",
-      image: "📈"
-    },
-    {
-      id: 4,
-      title: "Planificación de Emergencias Financieras",
-      summary: "Cómo prepararte para gastos inesperados.",
-      type: "video",
-      duration: "15 min",
-      category: "Emergencias",
-      image: "🚨"
+  const handleContentClick = (contentItem: EducationalContentItem) => {
+    if (contentItem.type === 'video' && contentItem.url) {
+      setSelectedVideo(contentItem as EducationalContent)
+    } else if (contentItem.url) {
+      window.open(contentItem.url, '_blank')
     }
-  ]
+  }
 
-  if (loading) {
+  if (loading || educationLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
@@ -180,7 +167,10 @@ export function Dashboard() {
 
   return (
     <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
-      {/* Header del Dashboard Mejorado */}
+      {showAdminPanel && (
+        <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+      )}
+
       <div className="text-center bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
         <div className="flex items-center justify-center mb-4">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-4 mr-4">
@@ -192,6 +182,7 @@ export function Dashboard() {
             </h1>
             <p className="text-xl text-gray-600">Tu centro de control financiero inteligente</p>
           </div>
+          
         </div>
         <div className="flex justify-center space-x-8 mt-6">
           <div className="text-center">
@@ -209,79 +200,74 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Métricas Principales Mejoradas */}
       {dashboardMetrics && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Total Ingresos */}
             <div className="bg-gradient-to-br from-green-400 via-green-500 to-green-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-green-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-2">💵</span>
-                    <p className="text-green-100 text-sm font-medium">Total Ingresos</p>
-                  </div>
-                  <p className="text-4xl font-bold mb-1">{formatCurrency(dashboardMetrics.totalIncome)}</p>
-                  <p className="text-green-100 text-sm">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyIncome)}</p>
+                  <p className="text-green-100 text-sm font-medium mb-1">💰 Total Ingresos</p>
+                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalIncome)}</p>
+                  <p className="text-green-100 text-xs mt-2">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyIncome)}/mes</p>
                 </div>
-                <div className="text-5xl opacity-80">📈</div>
+                <div className="bg-white bg-opacity-20 rounded-full p-3">
+                  <span className="text-2xl">📈</span>
+                </div>
               </div>
             </div>
 
-            {/* Total Gastos */}
             <div className="bg-gradient-to-br from-red-400 via-red-500 to-red-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-red-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-2">💳</span>
-                    <p className="text-red-100 text-sm font-medium">Total Gastos</p>
-                  </div>
-                  <p className="text-4xl font-bold mb-1">{formatCurrency(dashboardMetrics.totalExpenses)}</p>
-                  <p className="text-red-100 text-sm">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyExpenses)}</p>
+                  <p className="text-red-100 text-sm font-medium mb-1">💸 Total Gastos</p>
+                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalExpenses)}</p>
+                  <p className="text-red-100 text-xs mt-2">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyExpenses)}/mes</p>
                 </div>
-                <div className="text-5xl opacity-80">💸</div>
+                <div className="bg-white bg-opacity-20 rounded-full p-3">
+                  <span className="text-2xl">📉</span>
+                </div>
               </div>
             </div>
 
-            {/* Total Ahorros */}
             <div className="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-blue-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-2">🏦</span>
-                    <p className="text-blue-100 text-sm font-medium">Total Ahorros</p>
-                  </div>
-                  <p className="text-4xl font-bold mb-1">{formatCurrency(dashboardMetrics.totalSavings)}</p>
-                  <p className="text-blue-100 text-sm">Tasa: {dashboardMetrics.savingsRate.toFixed(1)}%</p>
+                  <p className="text-blue-100 text-sm font-medium mb-1">🏦 Total Ahorros</p>
+                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalSavings)}</p>
+                  <p className="text-blue-100 text-xs mt-2">Tasa: {dashboardMetrics.savingsRate.toFixed(1)}%</p>
                 </div>
-                <div className="text-5xl opacity-80">💎</div>
+                <div className="bg-white bg-opacity-20 rounded-full p-3">
+                  <span className="text-2xl">💎</span>
+                </div>
               </div>
             </div>
 
-            {/* Balance General */}
-            <div className={`bg-gradient-to-br ${(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? 'from-purple-400 via-purple-500 to-purple-600' : 'from-orange-400 via-orange-500 to-orange-600'} rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border ${(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? 'border-purple-300' : 'border-orange-300'}`}>
+            <div className={`bg-gradient-to-br ${(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? 'from-purple-400 via-purple-500 to-purple-600 border-purple-300' : 'from-orange-400 via-orange-500 to-orange-600 border-orange-300'} rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-2">⚖️</span>
-                    <p className="text-purple-100 text-sm font-medium">Balance Total</p>
-                  </div>
-                  <p className="text-4xl font-bold mb-1">{formatCurrency(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses)}</p>
-                  <p className="text-purple-100 text-sm">{dashboardMetrics.budgetCount} presupuestos</p>
+                  <p className="text-purple-100 text-sm font-medium mb-1">⚖️ Balance Total</p>
+                  <p className="text-3xl font-bold">
+                    {(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '+' : ''}
+                    {formatCurrency(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses)}
+                  </p>
+                  <p className="text-purple-100 text-xs mt-2">
+                    {(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '✅ Positivo' : '⚠️ Negativo'}
+                  </p>
                 </div>
-                <div className="text-5xl opacity-80">{(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '✅' : '⚠️'}</div>
+                <div className="bg-white bg-opacity-20 rounded-full p-3">
+                  <span className="text-2xl">{(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '🎯' : '⚠️'}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Métricas del Supermercado */}
           {groceryMetrics && (
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
               <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
                 <span className="bg-gradient-to-r from-orange-400 to-red-500 rounded-full p-3 mr-4">
                   🛒
                 </span>
-                Métricas del Supermercado
+                Métricas de Supermercado
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl p-6 border border-orange-300">
@@ -333,7 +319,6 @@ export function Dashboard() {
                 </div>
               </div>
               
-              {/* Consejos para el supermercado */}
               <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
                 <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
                   <span className="text-2xl mr-2">💡</span>
@@ -373,7 +358,6 @@ export function Dashboard() {
             </div>
           )}
 
-          {/* Gráfico de Tendencias Mensuales Mejorado */}
           {dashboardMetrics.monthlyData && (
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
               <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
@@ -388,15 +372,13 @@ export function Dashboard() {
                     <div className="mb-2">
                       <div className="text-sm font-medium text-gray-600 mb-1">{month.month}</div>
                       <div className="relative h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
-                        {/* Barra de ingresos */}
                         <div 
                           className="absolute bottom-0 left-0 w-1/2 bg-gradient-to-t from-green-500 to-green-400 rounded-tl-xl transition-all duration-1000 shadow-lg"
-                          style={{ height: `${Math.max((month.income / Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.income))) * 100, 5)}%` }}
+                          style={{ height: `${Math.min(100, Math.max((month.income / (Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.income)) || 1)) * 100, 5))}%` }}
                         ></div>
-                        {/* Barra de gastos */}
                         <div 
                           className="absolute bottom-0 right-0 w-1/2 bg-gradient-to-t from-red-500 to-red-400 rounded-tr-xl transition-all duration-1000 shadow-lg"
-                          style={{ height: `${Math.max((month.expenses / Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.expenses))) * 100, 5)}%` }}
+                          style={{ height: `${Math.min(100, Math.max((month.expenses / (Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.expenses)) || 1)) * 100, 5))}%` }}
                         ></div>
                       </div>
                     </div>
@@ -422,8 +404,7 @@ export function Dashboard() {
               </div>
             </div>
           )}
-
-          {/* Sección de Noticias Financieras */}
+          
           <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
             <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
               <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-3 mr-4">
@@ -432,107 +413,56 @@ export function Dashboard() {
               Centro de Educación Financiera
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {financialNews.map((news) => (
-                <div key={news.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {educationalContent.map((content) => (
+                <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl">{news.image}</span>
+                    <span className="text-4xl">{content.image_emoji}</span>
                     <div className="flex items-center space-x-2">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        news.type === 'video' 
+                        content.type === 'video' 
                           ? 'bg-red-100 text-red-700' 
                           : 'bg-blue-100 text-blue-700'
                       }`}>
-                        {news.type === 'video' ? '📹 Video' : '📄 Artículo'}
+                        {content.type === 'video' ? '📹 Video' : '📄 Artículo'}
                       </span>
                     </div>
                   </div>
                   
                   <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
-                    {news.title}
+                    {content.title}
                   </h4>
                   
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {news.summary}
+                    {content.summary}
                   </p>
                   
                   <div className="flex items-center justify-between">
                     <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                      news.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
-                      news.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
-                      news.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
+                      content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
+                      content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
+                      content.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
                       'bg-orange-100 text-orange-700'
                     }`}>
-                      {news.category}
+                      {content.category}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {news.type === 'video' ? news.duration : news.readTime}
+                      {content.type === 'video' ? content.duration : content.duration}
                     </span>
                   </div>
                   
-                  <button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
-                    {news.type === 'video' ? 'Ver Video' : 'Leer Artículo'}
+                  <button onClick={() => handleContentClick(content)} className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                    {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
                   </button>
                 </div>
               ))}
             </div>
             
-            {/* Sección de Videos Destacados */}
-            <div className="mt-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
-              <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <span className="text-3xl mr-3">🎥</span>
-                Videos Educativos Destacados
-              </h4>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="bg-gradient-to-br from-red-400 to-red-600 rounded-lg p-4 mb-4 text-center">
-                    <span className="text-4xl text-white">▶️</span>
-                  </div>
-                  <h5 className="font-bold text-gray-800 mb-2">Presupuesto 50/30/20</h5>
-                  <p className="text-sm text-gray-600 mb-3">Aprende la regla de oro para distribuir tus ingresos</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">8 min</span>
-                    <button className="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600 transition-colors">
-                      Ver Ahora
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-lg p-4 mb-4 text-center">
-                    <span className="text-4xl text-white">▶️</span>
-                  </div>
-                  <h5 className="font-bold text-gray-800 mb-2">Fondo de Emergencia</h5>
-                  <p className="text-sm text-gray-600 mb-3">Cómo crear tu colchón financiero paso a paso</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">12 min</span>
-                    <button className="bg-green-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-600 transition-colors">
-                      Ver Ahora
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
-                  <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg p-4 mb-4 text-center">
-                    <span className="text-4xl text-white">▶️</span>
-                  </div>
-                  <h5 className="font-bold text-gray-800 mb-2">Inversión Inteligente</h5>
-                  <p className="text-sm text-gray-600 mb-3">Primeros pasos en el mundo de las inversiones</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">15 min</span>
-                    <button className="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-blue-600 transition-colors">
-                      Ver Ahora
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Sección de videos destacados */}
+            <FeaturedVideos featuredContent={featuredContent} />
           </div>
 
-          {/* Estadísticas Adicionales Mejoradas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Ratio de Gastos */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-2 mr-3">
@@ -555,11 +485,10 @@ export function Dashboard() {
               </div>
               <p className="text-sm text-gray-500 mt-2">
                 {dashboardMetrics.expenseRatio < 70 ? '✅ Excelente control' : 
-                 dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
+                  dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
               </p>
             </div>
 
-            {/* Tasa de Ahorro */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-2 mr-3">
@@ -582,11 +511,10 @@ export function Dashboard() {
               </div>
               <p className="text-sm text-gray-500 mt-2">
                 {dashboardMetrics.savingsRate >= 20 ? '🌟 Excelente' : 
-                 dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
+                  dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
               </p>
             </div>
 
-            {/* Resumen Rápido */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
               <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-2 mr-3">
@@ -611,6 +539,15 @@ export function Dashboard() {
             </div>
           </div>
         </>
+      )}
+
+      {/* // CORREÇÃO: Adicionado o renderizado condicional do VideoPlayer aqui */}
+      {selectedVideo && (
+        <VideoPlayer
+          url={selectedVideo.url!}
+          title={selectedVideo.title}
+          onClose={() => setSelectedVideo(null)}
+        />
       )}
     </div>
   )

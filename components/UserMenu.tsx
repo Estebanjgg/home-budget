@@ -3,16 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { useEducationalContent } from '@/hooks/useEducationalContent'
 
 interface UserMenuProps {
   user: User
   onProfileClick: () => void
+  onAdminClick?: () => void
 }
 
-export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
+export default function UserMenu({ user, onProfileClick, onAdminClick }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
   const menuRef = useRef<HTMLDivElement>(null)
+  const { isAdmin } = useEducationalContent()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -148,6 +151,19 @@ export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
               </svg>
               Mi Perfil
             </button>
+            
+            {isAdmin && onAdminClick && (
+              <button
+                onClick={() => {
+                  onAdminClick()
+                  setIsOpen(false)
+                }}
+                className="flex items-center w-full px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 hover:text-orange-900"
+              >
+                <span className="text-lg mr-3">👨‍💼</span>
+                Administración
+              </button>
+            )}
             
             <button
               onClick={() => {

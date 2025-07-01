@@ -7,9 +7,10 @@ interface NavbarProps {
   activeTab: 'dashboard' | 'budgets' | 'grocery'
   onTabChange: (tab: 'dashboard' | 'budgets' | 'grocery') => void
   onProfileClick: () => void
+  onAdminClick?: () => void
 }
 
-export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarProps) {
+export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminClick }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const toggleMobileMenu = () => {
@@ -92,6 +93,7 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
             <UserMenu 
               user={user} 
               onProfileClick={onProfileClick}
+              onAdminClick={onAdminClick}
             />
           </div>
         </div>
@@ -199,6 +201,10 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
                       onProfileClick()
                       setIsMobileMenuOpen(false)
                     }}
+                    onAdminClick={onAdminClick ? () => {
+                      onAdminClick()
+                      setIsMobileMenuOpen(false)
+                    } : undefined}
                   />
                 </div>
               </div>

@@ -10,11 +10,12 @@ import type { Budget, BudgetItem, ExpenseCategory } from '@/lib/types'
 interface BudgetDetailProps {
   budget: Budget
   onBack: () => void
+  onDelete?: (budgetId: string) => Promise<void>
 }
 
-export function BudgetDetail({ budget, onBack }: BudgetDetailProps) {
+export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
   const { items, categories, loading, addItem, editItem, removeItem } = useBudgetItems(budget.id)
-  const { calculateSummary, removeBudget } = useBudgets()
+  const { calculateSummary, removeBudget, editBudget } = useBudgets()
   const [showItemForm, setShowItemForm] = useState(false)
   const [editingItem, setEditingItem] = useState<BudgetItem | null>(null)
   const [summary, setSummary] = useState<any>(null)
@@ -64,9 +65,15 @@ export function BudgetDetail({ budget, onBack }: BudgetDetailProps) {
   const handleDeleteBudget = async () => {
     setIsDeleting(true)
     try {
-      await removeBudget(budget.id)
+      if (onDelete) {
+        // Usar la función pasada desde BudgetManager
+        await onDelete(budget.id)
+      } else {
+        // Fallback al método original
+        await removeBudget(budget.id)
+        onBack()
+      }
       setShowDeleteModal(false)
-      onBack() // Regresar al dashboard después de eliminar
     } catch (error) {
       console.error('Error deleting budget:', error)
       alert('Error al eliminar el presupuesto. Por favor, inténtalo de nuevo.')
@@ -100,6 +107,19 @@ export function BudgetDetail({ budget, onBack }: BudgetDetailProps) {
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
       </div>
     )
+  }
+
+  const handleUpdateBudget = async (updates: Partial<Budget>) => {
+    try {
+      await editBudget(budget.id, updates)
+      // Actualizar el presupuesto local
+      Object.assign(budget, updates)
+      // Recalcular el resumen
+      loadSummary()
+    } catch (error) {
+      console.error('Error updating budget:', error)
+      throw error
+    }
   }
 
   return (
@@ -153,7 +173,13 @@ export function BudgetDetail({ budget, onBack }: BudgetDetailProps) {
       </div>
 
       {/* Resumen */}
-      {summary && <BudgetSummary budget={budget} summary={summary} />}
+      {summary && (
+        <BudgetSummary 
+          budget={budget} 
+          summary={summary} 
+          onUpdateBudget={handleUpdateBudget}
+        />
+      )}
 
       {/* Formulario de ítem */}
       {showItemForm && (

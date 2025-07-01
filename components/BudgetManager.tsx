@@ -6,7 +6,7 @@ import { BudgetDetail } from './BudgetDetail'
 import type { Budget } from '@/lib/types'
 
 export function BudgetManager() {
-  const { budgets, loading, error, addBudget } = useBudgets()
+  const { budgets, loading, error, addBudget, removeBudget } = useBudgets()
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null)
   const [showForm, setShowForm] = useState(false)
 
@@ -17,6 +17,16 @@ export function BudgetManager() {
       setShowForm(false)
     } catch (error) {
       console.error('Error creating budget:', error)
+    }
+  }
+
+  const handleDeleteBudget = async (budgetId: string) => {
+    try {
+      await removeBudget(budgetId)
+      setSelectedBudget(null) // Regresar a la lista después de eliminar
+    } catch (error) {
+      console.error('Error deleting budget:', error)
+      throw error // Re-lanzar el error para que BudgetDetail pueda manejarlo
     }
   }
 
@@ -56,6 +66,7 @@ export function BudgetManager() {
         <BudgetDetail 
           budget={selectedBudget} 
           onBack={() => setSelectedBudget(null)}
+          onDelete={handleDeleteBudget}
         />
       ) : showForm ? (
         <BudgetForm 

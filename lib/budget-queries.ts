@@ -54,12 +54,20 @@ export async function updateBudget(id: string, updates: Partial<Budget>) {
 }
 
 export async function deleteBudget(id: string) {
-  const { error } = await supabase
-    .from('budgets')
-    .delete()
-    .eq('id', id)
+  try {
+    const { error } = await supabase
+      .from('budgets')
+      .delete()
+      .eq('id', id)
 
-  if (error) throw error
+    if (error) {
+      console.error('Supabase delete error:', error)
+      throw error
+    }
+  } catch (error) {
+    console.error('Delete budget error:', error)
+    throw new Error('Error al eliminar el presupuesto. Por favor, inténtalo de nuevo.')
+  }
 }
 
 // Funciones para Budget Items

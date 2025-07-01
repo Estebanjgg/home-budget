@@ -254,6 +254,40 @@ export function useGroceryStores() {
     }
   };
 
+  // Eliminar mes completo
+  const deleteMonth = async (monthId: string) => {
+    try {
+      // Primero eliminar todos los items del mes
+      const { error: itemsError } = await supabase
+        .from('grocery_items')
+        .delete()
+        .eq('month_id', monthId)
+        .eq('user_id', user?.id);
+
+      if (itemsError) throw itemsError;
+
+      // Luego eliminar el mes
+      const { error: monthError } = await supabase
+        .from('grocery_months')
+        .delete()
+        .eq('id', monthId)
+        .eq('user_id', user?.id);
+
+      if (monthError) throw monthError;
+      
+      // Recargar lista de meses
+      await loadMonths();
+      
+      // Si el mes eliminado era el actual, limpiar el estado
+      if (currentMonth?.id === monthId) {
+        setCurrentMonth(null);
+        setMonthSummary(null);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al eliminar mes');
+    }
+  };
+
   useEffect(() => {
     loadInitialData();
   }, [user]);
@@ -373,6 +407,7 @@ export function useGroceryStores() {
     updateItem,
     deleteItem,
     deleteStore,
+    deleteMonth,
     togglePurchased,
     generatePDFReport,
     loadMonthSummary,

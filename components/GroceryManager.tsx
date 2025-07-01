@@ -23,6 +23,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     updateItem,
     deleteItem,
     deleteStore,
+    deleteMonth,
     togglePurchased,
     generatePDFReport,
     loadMonthSummary,
@@ -44,7 +45,9 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   });
   const [showOnlyPending, setShowOnlyPending] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'priority' | 'price'>('priority');
-  const [viewMode, setViewMode] = useState<'cards' | 'detail'>('cards'); // Nueva línea
+  const [viewMode, setViewMode] = useState<'cards' | 'detail'>('cards');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [monthToDelete, setMonthToDelete] = useState<{id: string, name: string} | null>(null);
 
   const handleCreateMonth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,12 +109,43 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const handleGeneratePDF = async () => {
     if (!currentMonth) return;
     
-    const reportData = await generatePDFReport(currentMonth.id);
-    if (reportData) {
-      // Aquí implementarías la generación del PDF usando una librería como jsPDF
-      console.log('Datos del reporte:', reportData);
-      alert('Funcionalidad de PDF en desarrollo. Ver consola para datos.');
+    try {
+      const report = await generatePDFReport(currentMonth.id);
+      if (report) {
+        console.log('Reporte generado:', report);
+      }
+    } catch (err) {
+      console.error('Error al generar PDF:', err);
     }
+  };
+
+  const handleDeleteMonth = (monthId: string, monthName: string) => {
+    setMonthToDelete({ id: monthId, name: monthName });
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteMonth = async () => {
+    if (!monthToDelete) return;
+    
+    try {
+      await deleteMonth(monthToDelete.id);
+      setShowDeleteConfirm(false);
+      setMonthToDelete(null);
+      // Regresar a la vista principal de meses
+      if (currentMonth?.id === monthToDelete.id) {
+        // Si estamos eliminando el mes actual, volver a la vista de selección
+        window.location.reload(); // O puedes usar un estado para controlar la vista
+      }
+    } catch (err) {
+      console.error('Error al eliminar mes:', err);
+      setShowDeleteConfirm(false);
+      setMonthToDelete(null);
+    }
+  };
+
+  const cancelDeleteMonth = () => {
+    setShowDeleteConfirm(false);
+    setMonthToDelete(null);
   };
 
   const filteredAndSortedItems = (items: GroceryItem[]) => {
@@ -374,6 +408,16 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
               <span>📄</span>
               <span>Generar PDF</span>
             </button>
+            
+            {currentMonth && (
+              <button
+                onClick={() => handleDeleteMonth(currentMonth.id, currentMonth.display_name)}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <span>🗑️</span>
+                <span>Eliminar Mes</span>
+              </button>
+            )}
           </div>
         </div>
         
@@ -712,5 +756,46 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           onCancel={() => setEditingItem(null)}
         />
       )}
+      
+      {/* Modal de confirmación para eliminar mes */}
+      {showDeleteConfirm && monthToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                <span className="text-3xl">🗑️</span>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                Eliminar Mes
+              </h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                ¿Estás seguro de que quieres eliminar el mes <strong>"{monthToDelete.name}"</strong>?
+                <br />
+                <span className="text-red-600 font-medium">
+                  Esta acción no se puede deshacer y eliminará todos los productos de este mes.
+                </span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={cancelDeleteMonth}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteMonth}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )};
+  );
+}

@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 import type { EducationalContent } from '@/lib/types'
-// CORREÇÃO: O componente VideoPlayer precisa ser importado. 
-// Substitua './VideoPlayer' pelo caminho correto do seu arquivo.
 import { VideoPlayer } from './VideoPlayer' 
 
 interface EducationAdminProps {

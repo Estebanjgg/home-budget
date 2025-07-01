@@ -1,4 +1,5 @@
-import { supabase } from './supabase'
+import { supabase } from './config/supabase'
+
 import type { Budget, BudgetItem, ExpenseCategory, BudgetSummary } from './types'
 
 // Funciones para Budgets

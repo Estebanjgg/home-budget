@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/config/supabase';
 import { useAuth } from './useAuth';
 import { GroceryStore, GroceryMonth, GroceryItem, GroceryStoreWithItems, GroceryMonthSummary, GroceryItemFormData } from '@/lib/grocery-types';
 

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/config/supabase'
+
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 
 interface UserMenuProps {

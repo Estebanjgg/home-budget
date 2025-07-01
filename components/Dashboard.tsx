@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 import { getBudgetItems } from '@/lib/budget-queries'
-import { EducationAdmin } from './EducationAdmin'
-import { FeaturedVideos } from './FeaturedVideos'
-import { VideoPlayer } from './VideoPlayer'
+import { EducationAdmin } from './education/EducationAdmin'
+import { FeaturedVideos } from './education/FeaturedVideos'
+import { VideoPlayer } from './education/VideoPlayer'
+
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
 interface EducationalContentItem {

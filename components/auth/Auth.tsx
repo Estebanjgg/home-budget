@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/config/supabase'
+
 
 type AuthMode = 'login' | 'register' | 'reset'
 type PasswordStrength = 'weak' | 'medium' | 'strong'

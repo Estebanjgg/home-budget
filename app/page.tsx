@@ -4,12 +4,15 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import Auth from '@/components/Auth'
 import UserProfile from '@/components/UserProfile'
-import UserMenu from '@/components/UserMenu'
-import { BudgetDashboard } from '@/components/BudgetDashboard'
+import { Navbar } from '@/components/Navbar'
+import { Dashboard } from '@/components/Dashboard'
+import { BudgetManager } from '@/components/BudgetManager'
+import { Footer } from '../components/Footer'
 
 export default function Home() {
   const { user, loading } = useAuth()
   const [showProfile, setShowProfile] = useState(false)
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets'>('dashboard')
 
   if (loading) {
     return (
@@ -87,25 +90,42 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <img 
-                src="/logo-aplicativo/logo_esteban.png" 
-                alt="Home Budget" 
-                className="h-8 w-auto mr-3"
-              />
-              <h1 className="text-xl font-bold text-gray-800">Home Budget</h1>
+      {/* Navbar unificado que incluye la funcionalidad de Navigation.tsx */}
+      {!showProfile && (
+        <Navbar 
+          user={user}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onProfileClick={() => setShowProfile(true)}
+        />
+      )}
+
+      {/* Header simple para el perfil */}
+      {showProfile && (
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <img 
+                  src="/logo-aplicativo/logo_esteban.png" 
+                  alt="Home Budget" 
+                  className="h-8 w-auto mr-3"
+                />
+                <h1 className="text-xl font-bold text-gray-800">Home Budget</h1>
+              </div>
+              <button
+                onClick={() => setShowProfile(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <span className="sr-only">Cerrar perfil</span>
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <UserMenu 
-              user={user} 
-              onProfileClick={() => setShowProfile(true)}
-            />
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -114,10 +134,15 @@ export default function Home() {
             user={user} 
             onClose={() => setShowProfile(false)}
           />
+        ) : activeTab === 'dashboard' ? (
+          <Dashboard />
         ) : (
-          <BudgetDashboard />
+          <BudgetManager />
         )}
       </main>
+      
+      {/* Agregar el footer al final */}
+      <Footer />
     </div>
   )
 }

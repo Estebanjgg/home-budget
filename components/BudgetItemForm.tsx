@@ -72,27 +72,27 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className={`p-6 rounded-t-xl text-white ${
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-xs sm:max-w-md lg:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className={`p-4 sm:p-6 rounded-t-xl text-white ${
           formData.type === 'income' 
             ? 'bg-gradient-to-r from-green-600 to-emerald-600'
             : 'bg-gradient-to-r from-red-600 to-rose-600'
         }`}>
-          <h2 className="text-xl font-bold">
+          <h2 className="text-lg sm:text-xl font-bold">
             {formData.type === 'income' ? '💰' : '💸'} 
             {initialData ? 'Editar' : 'Agregar'} {formData.type === 'income' ? 'Ingreso' : 'Gasto'}
           </h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           {/* Tipo */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tipo
             </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+              <label className="flex items-center justify-center sm:justify-start p-2 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none border-green-200 sm:border-transparent bg-green-50 sm:bg-transparent">
                 <input
                   type="radio"
                   value="income"
@@ -100,9 +100,9 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
                   onChange={(e) => handleInputChange('type', e.target.value)}
                   className="mr-2 text-green-600"
                 />
-                <span className="text-green-600">💰 Ingreso</span>
+                <span className="text-green-600 text-sm sm:text-base font-medium sm:font-normal">💰 Ingreso</span>
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center justify-center sm:justify-start p-2 sm:p-0 border sm:border-0 rounded-lg sm:rounded-none border-red-200 sm:border-transparent bg-red-50 sm:bg-transparent">
                 <input
                   type="radio"
                   value="expense"
@@ -110,7 +110,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
                   onChange={(e) => handleInputChange('type', e.target.value)}
                   className="mr-2 text-red-600"
                 />
-                <span className="text-red-600">💸 Gasto</span>
+                <span className="text-red-600 text-sm sm:text-base font-medium sm:font-normal">💸 Gasto</span>
               </label>
             </div>
           </div>
@@ -124,12 +124,12 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
               type="text"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.description ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder={formData.type === 'income' ? 'Ej: Salario, Freelance...' : 'Ej: Pago del alquiler, Compras...'}
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.description}</p>}
           </div>
 
           {/* Categoría (solo para gastos) */}
@@ -141,7 +141,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
               <select
                 value={formData.category_id}
                 onChange={(e) => handleInputChange('category_id', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.category_id ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -152,7 +152,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
                   </option>
                 ))}
               </select>
-              {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id}</p>}
+              {errors.category_id && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.category_id}</p>}
             </div>
           )}
 
@@ -162,12 +162,12 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
               Monto Estimado
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2 text-gray-500">$</span>
+              <span className="absolute left-3 top-2 text-gray-500 text-sm sm:text-base">$</span>
               <input
                 type="number"
                 value={formData.estimated_amount}
                 onChange={(e) => handleInputChange('estimated_amount', parseFloat(e.target.value) || 0)}
-                className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-8 pr-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.estimated_amount ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="0"
@@ -175,7 +175,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
                 step="0.01"
               />
             </div>
-            {errors.estimated_amount && <p className="text-red-500 text-sm mt-1">{errors.estimated_amount}</p>}
+            {errors.estimated_amount && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.estimated_amount}</p>}
           </div>
 
           {/* Fecha de vencimiento */}
@@ -187,36 +187,36 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
               type="date"
               value={formData.due_date}
               onChange={(e) => handleInputChange('due_date', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           {/* Estado de pago */}
-          <div className="flex items-center">
+          <div className="flex items-center p-3 bg-gray-50 rounded-lg">
             <input
               type="checkbox"
               checked={formData.is_paid}
               onChange={(e) => handleInputChange('is_paid', e.target.checked)}
-              className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label className="text-sm text-gray-700">
+            <label className="text-sm sm:text-base text-gray-700 font-medium">
               {formData.type === 'income' ? 'Recibido' : 'Pagado'}
             </label>
           </div>
 
           {/* Botones */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="w-full sm:flex-1 px-4 py-3 sm:py-2 text-sm sm:text-base border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 px-4 py-2 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`w-full sm:flex-1 px-4 py-3 sm:py-2 text-sm sm:text-base text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium ${
                 formData.type === 'income'
                   ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
                   : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700'

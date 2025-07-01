@@ -105,39 +105,49 @@ export function BudgetDetail({ budget, onBack }: BudgetDetailProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <button
             onClick={onBack}
-            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
           >
             ← Volver a Presupuestos
           </button>
-          <div className="flex gap-2">
+          
+          {/* Botones responsivos */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShowItemForm(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              className="bg-green-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base font-medium flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto"
             >
-              ➕ Agregar Ingreso
+              <span className="text-base sm:text-lg">➕</span>
+              <span className="hidden xs:inline sm:inline">Agregar Ingreso</span>
+              <span className="xs:hidden sm:hidden">Ingreso</span>
             </button>
+            
             <button
               onClick={() => setShowItemForm(true)}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              className="bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base font-medium flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto"
             >
-              ➖ Agregar Gasto
+              <span className="text-base sm:text-lg">➖</span>
+              <span className="hidden xs:inline sm:inline">Agregar Gasto</span>
+              <span className="xs:hidden sm:hidden">Gasto</span>
             </button>
+            
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors flex items-center gap-2"
+              className="bg-gray-800 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-900 transition-colors text-sm sm:text-base font-medium flex items-center justify-center gap-1 sm:gap-2 w-full sm:w-auto"
               title="Eliminar presupuesto completo"
             >
-              🗑️ Eliminar Presupuesto
+              <span className="text-base sm:text-lg">🗑️</span>
+              <span className="hidden xs:inline sm:inline">Eliminar Presupuesto</span>
+              <span className="xs:hidden sm:hidden">Eliminar</span>
             </button>
           </div>
         </div>
         
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">{budget.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{budget.name}</h1>
           <p className="text-gray-600">{MONTHS[budget.month - 1]} {budget.year}</p>
         </div>
       </div>

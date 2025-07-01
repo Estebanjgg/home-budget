@@ -11,6 +11,7 @@ interface UserMenuProps {
 
 export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -25,6 +26,16 @@ export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  useEffect(() => {
+    if (isOpen && menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right
+      })
+    }
+  }, [isOpen])
 
   const handleLogout = async () => {
     try {
@@ -77,9 +88,15 @@ export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Usando posicionamiento fijo */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-[60] max-w-[calc(100vw-1rem)] md:max-w-none">
+        <div 
+          className="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-[9999] w-56 max-w-[calc(100vw-1rem)]"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            right: `${dropdownPosition.right}px`
+          }}
+        >
           {/* User Info */}
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center space-x-3">
@@ -134,7 +151,6 @@ export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
             
             <button
               onClick={() => {
-                // Aquí puedes agregar configuraciones adicionales
                 setIsOpen(false)
               }}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"

@@ -127,16 +127,38 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     setEditingItem(null);
   };
 
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [pdfMessage, setPdfMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
   const handleGeneratePDF = async () => {
     if (!currentMonth) return;
     
+    setIsGeneratingPDF(true);
+    setPdfMessage(null);
+    
     try {
-      const report = await generatePDFReport(currentMonth.id);
-      if (report) {
-        console.log('Reporte generado:', report);
+      const result = await generatePDFReport(currentMonth.id);
+      if (result?.success) {
+        setPdfMessage({
+          type: 'success',
+          text: '¡PDF generado y descargado exitosamente!'
+        });
+      } else {
+        setPdfMessage({
+          type: 'error',
+          text: result?.error || 'Error al generar el PDF'
+        });
       }
     } catch (err) {
       console.error('Error al generar PDF:', err);
+      setPdfMessage({
+        type: 'error',
+        text: 'Error inesperado al generar el PDF'
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+      // Limpiar mensaje después de 5 segundos
+      setTimeout(() => setPdfMessage(null), 5000);
     }
   };
 
@@ -424,11 +446,35 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             
             <button
               onClick={handleGeneratePDF}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2"
+              disabled={isGeneratingPDF}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-purple-400 disabled:cursor-not-allowed"
             >
-              <span>📄</span>
-              <span>Generar PDF</span>
+              {isGeneratingPDF ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <span>Generando...</span>
+                </>
+              ) : (
+                <>
+                  <span>📄</span>
+                  <span>Generar PDF</span>
+                </>
+              )}
             </button>
+            
+            {/* Mensaje de estado del PDF */}
+            {pdfMessage && (
+              <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+                pdfMessage.type === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              } animate-pulse`}>
+                <div className="flex items-center gap-2">
+                  <span>{pdfMessage.type === 'success' ? '✅' : '❌'}</span>
+                  <span className="font-medium">{pdfMessage.text}</span>
+                </div>
+              </div>
+            )}
             
             {currentMonth && (
               <button

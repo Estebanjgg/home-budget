@@ -352,45 +352,34 @@ export function useGroceryStores() {
 
   // Generar reporte PDF
   const generatePDFReport = async (monthId: string) => {
-    if (!user) return null;
-
     try {
-      // Cargar datos completos del mes
-      const { data: monthData, error: monthError } = await supabase
-        .from('grocery_months')
-        .select('*')
-        .eq('id', monthId)
-        .single();
-
-      if (monthError) throw monthError;
-
-      const { data: itemsData, error: itemsError } = await supabase
-        .from('grocery_items')
-        .select(`
-          *,
-          grocery_stores!inner(*)
-        `)
-        .eq('month_id', monthId)
-        .eq('user_id', user.id)
-        .order('grocery_stores.name', { ascending: true })
-        .order('purchased', { ascending: true })
-        .order('priority', { ascending: false });
-
-      if (itemsError) throw itemsError;
-
+      // Cargar datos completos del mes si no están cargados
+      if (!monthSummary || monthSummary.month.id !== monthId) {
+        await loadMonthSummary(monthId);
+      }
+      
+      // Verificar que tenemos los datos
+      if (!monthSummary) {
+        throw new Error('No se pudieron cargar los datos del mes');
+      }
+      
+      // Importar dinámicamente el generador de PDF
+      const { generateGroceryPDF } = await import('@/lib/pdf-generator');
+      
+      // Generar el PDF
+      generateGroceryPDF(monthSummary);
+      
       return {
-        month: monthData,
-        items: itemsData || [],
-        summary: {
-          totalItems: itemsData?.length || 0,
-          purchasedItems: itemsData?.filter(item => item.purchased).length || 0,
-          pendingItems: itemsData?.filter(item => !item.purchased).length || 0,
-          grandTotal: itemsData?.reduce((sum, item) => sum + item.total_amount, 0) || 0
-        }
+        success: true,
+        message: 'Reporte PDF generado exitosamente'
       };
     } catch (err) {
+      console.error('Error al generar PDF:', err);
       setError(err instanceof Error ? err.message : 'Error al generar reporte');
-      return null;
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Error al generar reporte'
+      };
     }
   };
 

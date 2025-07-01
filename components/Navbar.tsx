@@ -97,7 +97,7 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
         </div>
 
         {/* Mobile Layout */}
-        <div className="md:hidden">
+        <div className="md:hidden relative">
           {/* Mobile Header */}
           <div className="flex justify-between items-center h-16">
             {/* Logo compacto */}
@@ -133,10 +133,10 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
           </div>
 
           {/* Mobile Menu */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}>
-            <div className="py-4 space-y-3">
+          <div className={`transition-all duration-300 ease-in-out ${
+            isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          } overflow-hidden`}>
+            <div className="py-4 space-y-3 overflow-visible">
               {/* Navigation Buttons */}
               <button
                 onClick={() => {
@@ -172,15 +172,35 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick }: NavbarP
                 </span>
               </button>
 
+              {/* Botón Mis Gastos Supermercado - AGREGADO */}
+              <button
+                onClick={() => {
+                  onTabChange('grocery')
+                  setIsMobileMenuOpen(false)
+                }}
+                className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                  activeTab === 'grocery'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                    : 'bg-white/70 text-gray-600 hover:bg-white hover:text-purple-600 border border-gray-200/50'
+                }`}
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <span className="text-base">🛒</span>
+                  <span>Mis Gastos Supermercado</span>
+                </span>
+              </button>
+
               {/* User Menu Mobile */}
-              <div className="pt-3 border-t border-gray-200">
-                <UserMenu 
-                  user={user} 
-                  onProfileClick={() => {
-                    onProfileClick()
-                    setIsMobileMenuOpen(false)
-                  }}
-                />
+              <div className="pt-3 border-t border-gray-200 relative z-50">
+                <div className="overflow-visible">
+                  <UserMenu 
+                    user={user} 
+                    onProfileClick={() => {
+                      onProfileClick()
+                      setIsMobileMenuOpen(false)
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

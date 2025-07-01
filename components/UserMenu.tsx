@@ -79,7 +79,7 @@ export default function UserMenu({ user, onProfileClick }: UserMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-[60] max-w-[calc(100vw-1rem)] md:max-w-none">
           {/* User Info */}
           <div className="px-4 py-3 border-b border-gray-100">
             <div className="flex items-center space-x-3">

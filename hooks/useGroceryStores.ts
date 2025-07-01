@@ -261,13 +261,24 @@ export function useGroceryStores() {
   // Actualizar producto
   const updateItem = async (itemId: string, updates: Partial<GroceryItemFormData>) => {
     try {
+      // Filtrar solo los campos que deben ser actualizados
+      const allowedUpdates: any = {};
+      
+      if (updates.product_name !== undefined) allowedUpdates.product_name = updates.product_name;
+      if (updates.quantity !== undefined) allowedUpdates.quantity = updates.quantity;
+      if (updates.unit_price !== undefined) allowedUpdates.unit_price = updates.unit_price;
+      if (updates.notes !== undefined) allowedUpdates.notes = updates.notes;
+      if (updates.priority !== undefined) allowedUpdates.priority = updates.priority;
+      
+      // NO calcular total_amount - es una columna generada automáticamente
+      // La base de datos lo calcula automáticamente como quantity * unit_price
+      
+      // Siempre actualizar updated_at
+      allowedUpdates.updated_at = new Date().toISOString();
+
       const { data, error } = await supabase
         .from('grocery_items')
-        .update({
-          ...updates,
-          total_amount: updates.quantity && updates.unit_price ? updates.quantity * updates.unit_price : undefined,
-          updated_at: new Date().toISOString()
-        })
+        .update(allowedUpdates)
         .eq('id', itemId)
         .select()
         .single();
@@ -278,11 +289,8 @@ export function useGroceryStores() {
       if (currentMonth) {
         await loadMonthSummary(currentMonth.id);
       }
-      
-      return data;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al actualizar producto');
-      return null;
     }
   };
 

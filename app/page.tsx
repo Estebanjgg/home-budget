@@ -10,6 +10,7 @@ import { BudgetManager } from '@/components/budget/BudgetManager'
 import { Footer } from '../components/layout/Footer'
 import GroceryManager from '@/components/grocery/GroceryManager'
 import { EducationAdmin } from '@/components/education/EducationAdmin'
+import { getAssetPath } from '@/lib/utils'
 
 
 export default function Home() {
@@ -41,7 +42,7 @@ export default function Home() {
             loop 
             playsInline
           >
-            <source src="/video/Jun_30__1252_16s_202506301308_zeh4h.mp4" type="video/mp4" />
+            <source src={getAssetPath("/video/Jun_30__1252_16s_202506301308_zeh4h.mp4")} type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
@@ -57,7 +58,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="mb-8">
               <img 
-                src="/logo-aplicativo/logo_esteban.png" 
+                src={getAssetPath("/logo-aplicativo/logo_esteban.png")} 
                 alt="Home Budget Logo" 
                 className="h-20 w-auto mx-auto mb-6 drop-shadow-lg"
               />
@@ -117,7 +118,7 @@ export default function Home() {
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
                 <img 
-                  src="/logo-aplicativo/logo_esteban.png" 
+                  src={getAssetPath("/logo-aplicativo/logo_esteban.png")} 
                   alt="Home Budget" 
                   className="h-8 w-auto mr-3"
                 />

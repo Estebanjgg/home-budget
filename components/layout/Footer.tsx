@@ -1,4 +1,5 @@
 import React from 'react'
+import { getAssetPath } from '@/lib/utils'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -12,7 +13,7 @@ export function Footer() {
           <div className="space-y-3 sm:space-y-4 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start space-x-3">
               <img 
-                src="/logo-aplicativo/logo_esteban.png" 
+                src={getAssetPath("/logo-aplicativo/logo_esteban.png")} 
                 alt="Home Budget" 
                 className="h-6 sm:h-8 w-auto"
               />

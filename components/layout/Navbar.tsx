@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import UserMenu from './UserMenu'
 import type { User } from '@supabase/supabase-js'
+import { getAssetPath } from '@/lib/utils'
 
 interface NavbarProps {
   user: User
@@ -26,7 +27,7 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminCl
           <div className="flex items-center group flex-shrink-0">
             <div className="relative">
               <img 
-                src="/logo-aplicativo/logo_esteban.png" 
+                src={getAssetPath("/logo-aplicativo/logo_esteban.png")} 
                 alt="Home Budget" 
                 className="h-10 w-auto mr-4 transition-transform duration-300 group-hover:scale-110 drop-shadow-md"
               />
@@ -105,7 +106,7 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminCl
             {/* Logo compacto */}
             <div className="flex items-center">
               <img 
-                src="/logo-aplicativo/logo_esteban.png" 
+                src={getAssetPath("/logo-aplicativo/logo_esteban.png")} 
                 alt="Home Budget" 
                 className="h-8 w-auto mr-2"
               />

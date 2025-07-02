@@ -103,15 +103,43 @@ Para verificar que todo funciona correctamente:
 
 ## Solución de Problemas
 
-### ⚠️ ERROR COMÚN: URL de Callback Incompleta
-**PROBLEMA DETECTADO:** Tienes `http://localhost:3000/auth/callbac` en lugar de `http://localhost:3000/auth/callback`
+## ERRORES COMUNES
 
-**SOLUCIÓN:**
+### ⚠️ **Error 1: URL de callback incompleta en Supabase**
+
+Si ves un error como este en la configuración de Supabase:
+```
+http://localhost:3000/auth/callbac
+```
+
+**Problema:** Falta la letra 'k' al final de 'callback'
+
+**Solución:** Corregir la URL a:
+```
+http://localhost:3000/auth/callback
+```
+
+**PASOS PARA CORREGIR:**
 1. Ve a tu panel de Supabase Dashboard
 2. Navega a Authentication > URL Configuration
 3. En "Redirect URLs", elimina la URL incorrecta: `http://localhost:3000/auth/callbac`
 4. Agrega la URL correcta: `http://localhost:3000/auth/callback` (con la 'k' al final)
 5. Haz clic en "Save changes"
+
+### ⚠️ **Error 2: Redirección sin basePath en GitHub Pages**
+
+Si el email de verificación redirige a:
+```
+https://estebanjgg.github.io/auth/callback
+```
+En lugar de:
+```
+https://estebanjgg.github.io/home-budget/auth/callback
+```
+
+**Problema:** La función `getBaseUrl()` no está considerando el `basePath` configurado en `next.config.ts`
+
+**Solución:** La función `getBaseUrl()` ahora detecta automáticamente si estamos en una ruta con `/home-budget/` y ajusta la URL base accordingly.
 
 ### Error: "Invalid redirect URL"
 - Verifica que todas las URLs estén agregadas en Supabase Dashboard

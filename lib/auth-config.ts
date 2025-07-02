@@ -7,7 +7,8 @@
 export function getBaseUrl(): string {
   // En el cliente (browser)
   if (typeof window !== 'undefined') {
-    return window.location.origin
+    // En el cliente, usar la URL completa incluyendo el basePath
+    return window.location.origin + (window.location.pathname.startsWith('/home-budget') ? '/home-budget' : '')
   }
   
   // En el servidor (durante build)

@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next build",
+    "deploy:test": "npm run export && npx serve out"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.7",

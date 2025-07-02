@@ -53,7 +53,17 @@ Una aplicación web moderna para gestionar el presupuesto familiar de manera int
 
 3. **Configurar variables de entorno**
    
-   El archivo `.env.local` ya está configurado con las credenciales de Supabase.
+   Copia el archivo de ejemplo y configura tus credenciales:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Edita `.env.local` con tus credenciales de Supabase:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=tu-url-de-supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-clave-anonima
+   SUPABASE_SERVICE_ROLE_KEY=tu-clave-de-servicio
+   ```
 
 4. **Configurar Supabase**
    
@@ -69,6 +79,34 @@ Una aplicación web moderna para gestionar el presupuesto familiar de manera int
 6. **Abrir en el navegador**
    
    Visita [http://localhost:3000](http://localhost:3000)
+
+## 🌐 Despliegue en GitHub Pages
+
+Esta aplicación está configurada para desplegarse automáticamente en GitHub Pages usando GitHub Actions.
+
+### Configuración para Despliegue
+
+1. **Configura las variables de ambiente** en GitHub Secrets (Settings > Secrets and variables > Actions):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXTAUTH_SECRET` (opcional)
+   - `NEXTAUTH_URL` (opcional)
+
+2. **Habilita GitHub Pages**:
+   - Ve a Settings > Pages
+   - En Source, selecciona "GitHub Actions"
+
+3. **Despliegue automático**:
+   - Cada push a la rama `main` activará el workflow
+   - Tu aplicación estará disponible en: `https://tu-usuario.github.io/home-budget`
+
+### Scripts de Despliegue
+
+- `npm run export` - Genera una exportación estática
+- `npm run deploy:test` - Prueba el build estático localmente
+
+Para instrucciones detalladas, consulta [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## 📁 Estructura del proyecto
 

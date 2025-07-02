@@ -72,20 +72,6 @@ export async function deleteBudget(id: string) {
 }
 
 // Funciones para Budget Items
-export async function createBudgetItem(item: Omit<BudgetItem, 'id' | 'created_at' | 'updated_at'>) {
-  const { data, error } = await supabase
-    .from('budget_items')
-    .insert(item)
-    .select(`
-      *,
-      category:expense_categories(*)
-    `)
-    .single()
-
-  if (error) throw error
-  return data
-}
-
 export async function getBudgetItems(budgetId: string) {
   const { data, error } = await supabase
     .from('budget_items')
@@ -98,6 +84,20 @@ export async function getBudgetItems(budgetId: string) {
 
   if (error) throw error
   return data as (BudgetItem & { category: ExpenseCategory | null })[]
+}
+
+export async function createBudgetItem(item: Omit<BudgetItem, 'id' | 'created_at' | 'updated_at'>) {
+  const { data, error } = await supabase
+    .from('budget_items')
+    .insert(item)
+    .select(`
+      *,
+      category:expense_categories(*)
+    `)
+    .single()
+
+  if (error) throw error
+  return data
 }
 
 export async function updateBudgetItem(id: string, updates: Partial<BudgetItem>) {

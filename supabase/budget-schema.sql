@@ -128,3 +128,6 @@ CREATE TRIGGER update_budgets_updated_at BEFORE UPDATE ON budgets
 
 CREATE TRIGGER update_budget_items_updated_at BEFORE UPDATE ON budget_items
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Agregar columna de notas a la tabla budget_items
+ALTER TABLE budget_items ADD COLUMN notes TEXT;

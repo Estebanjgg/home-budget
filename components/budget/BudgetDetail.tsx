@@ -194,9 +194,9 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
       {/* Lista de ítems agrupados */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Ingresos */}
-        {groupedItems.income && (
+        {groupedItems.income && groupedItems.income.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold text-green-600 mb-4 flex items-center">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
               💰 Ingresos ({groupedItems.income.length})
             </h3>
             <div className="space-y-3">
@@ -207,6 +207,14 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                       <h4 className="font-medium text-gray-800">{item.description}</h4>
                       {item.due_date && (
                         <p className="text-sm text-gray-600">Fecha: {new Date(item.due_date).toLocaleDateString('es-CO')}</p>
+                      )}
+                      {/* Mostrar notas si existen */}
+                      {item.notes && (
+                        <div className="mt-2 p-2 bg-green-100 rounded-md border-l-4 border-green-400">
+                          <p className="text-sm text-gray-700">
+                            <span className="font-medium text-green-700">📝 Nota:</span> {item.notes}
+                          </p>
+                        </div>
                       )}
                     </div>
                     <div className="text-right">
@@ -274,6 +282,14 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                                 {item.is_paid ? 'Pagado' : 'Pendiente'}
                               </span>
                             </div>
+                            {/* Mostrar notas si existen - DEBAJO DEL ESTADO */}
+                            {item.notes && (
+                              <div className="mt-2 p-2 bg-red-100 rounded-md border-l-4 border-red-400">
+                                <p className="text-sm text-gray-700">
+                                  <span className="font-medium text-red-700">📝 Nota:</span> {item.notes}
+                                </p>
+                              </div>
+                            )}
                           </div>
                           <div className="text-right">
                             <p className="font-semibold text-red-600">{formatCurrency(item.estimated_amount)}</p>

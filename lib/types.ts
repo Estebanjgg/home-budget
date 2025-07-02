@@ -31,6 +31,7 @@ export interface BudgetItem {
   actual_amount: number | null
   due_date: string | null
   is_paid: boolean
+  notes?: string | null  // Nuevo campo opcional
   created_at: string
   updated_at: string
   category?: ExpenseCategory

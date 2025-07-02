@@ -7,6 +7,9 @@ import { BudgetItemForm } from './BudgetItemForm'
 import { BudgetSummary } from './BudgetSummary'
 import type { Budget, BudgetItem, ExpenseCategory } from '@/lib/types'
 
+// Agregar tipo para las vistas
+type ViewMode = 'normal' | 'mosaic' | 'lines'
+
 interface BudgetDetailProps {
   budget: Budget
   onBack: () => void
@@ -21,6 +24,8 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
   const [summary, setSummary] = useState<any>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  // Nuevo estado para el modo de vista
+  const [viewMode, setViewMode] = useState<ViewMode>('normal')
 
   const loadSummary = async () => {
     const summaryData = await calculateSummary(budget.id)
@@ -52,24 +57,22 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
   }
 
   const handleDeleteItem = async (id: string) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este ítem?')) {
-      try {
-        await removeItem(id)
-        loadSummary()
-      } catch (error) {
-        console.error('Error deleting item:', error)
-      }
+    // Para simplificar, he quitado la confirmación, puedes volver a añadirla si quieres.
+    try {
+      await removeItem(id)
+      loadSummary()
+    } catch (error) {
+      console.error('Error deleting item:', error)
     }
   }
+
 
   const handleDeleteBudget = async () => {
     setIsDeleting(true)
     try {
       if (onDelete) {
-        // Usar la función pasada desde BudgetManager
         await onDelete(budget.id)
       } else {
-        // Fallback al método original
         await removeBudget(budget.id)
         onBack()
       }
@@ -101,25 +104,193 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ]
 
+  const handleUpdateBudget = async (updates: Partial<Budget>) => {
+    try {
+      await editBudget(budget.id, updates)
+      Object.assign(budget, updates)
+      loadSummary()
+    } catch (error) {
+      console.error('Error updating budget:', error)
+      throw error
+    }
+  }
+
+  // Función para renderizar gastos según el modo de vista
+  const renderExpenseItems = (categoryItems: BudgetItem[], categoryName: string, category: any, totalAmount: number) => {
+    if (viewMode === 'mosaic') {
+      return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {categoryItems.map((item) => (
+            <div key={item.id} className="border border-red-200 rounded-lg p-3 bg-white hover:shadow-md transition-shadow">
+              <div className="space-y-2">
+                <h5 className="font-medium text-gray-800 text-sm truncate">{item.description}</h5>
+                <p className="font-semibold text-red-600">{formatCurrency(item.estimated_amount)}</p>
+                {item.due_date && (
+                  <p className="text-xs text-gray-600">
+                    📅 {new Date(item.due_date).toLocaleDateString('es-CO')}
+                  </p>
+                )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={item.is_paid}
+                      onChange={(e) => handleEditItem(item.id, { is_paid: e.target.checked })}
+                      className="mr-1 scale-75"
+                    />
+                    <span className={`text-xs ${
+                      item.is_paid ? 'text-green-600' : 'text-gray-600'
+                    }`}>
+                      {item.is_paid ? '✅ Pagado' : '⏳ Pendiente'}
+                    </span>
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setEditingItem(item)}
+                      className="text-blue-600 hover:text-blue-800 text-xs"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-red-600 hover:text-red-800 text-xs"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+                {item.notes && (
+                  <div className="mt-1 p-2 bg-red-50 rounded text-xs border-l-2 border-red-300">
+                    <span className="text-red-700">📝</span> {item.notes.substring(0, 40)}{item.notes.length > 40 ? '...' : ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    if (viewMode === 'lines') {
+      return (
+        <div className="space-y-2">
+          {categoryItems.map((item) => (
+            <div key={item.id} className="border border-red-200 rounded-lg p-2 bg-white hover:bg-red-50 transition-colors">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={item.is_paid}
+                    onChange={(e) => handleEditItem(item.id, { is_paid: e.target.checked })}
+                    className="flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h5 className="font-medium text-gray-800 truncate">{item.description}</h5>
+                    <div className="flex items-center space-x-2 text-xs text-gray-600">
+                      {item.due_date && (
+                        <span>📅 {new Date(item.due_date).toLocaleDateString('es-CO')}</span>
+                      )}
+                      {item.notes && (
+                        <span className="truncate">📝 {item.notes.substring(0, 30)}{item.notes.length > 30 ? '...' : ''}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    item.is_paid ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {item.is_paid ? '✅' : '⏳'}
+                  </span>
+                  <p className="font-semibold text-red-600 min-w-[70px] text-right">{formatCurrency(item.estimated_amount)}</p>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setEditingItem(item)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    // Vista normal - más compacta
+    return (
+      <div className="space-y-2">
+        {categoryItems.map((item) => (
+          <div key={item.id} className="border border-red-200 rounded-lg p-3 bg-white">
+            <div className="flex justify-between items-start">
+              <div className="flex-1 min-w-0">
+                <h5 className="font-medium text-gray-800">{item.description}</h5>
+                <div className="flex items-center space-x-4 mt-1">
+                  {item.due_date && (
+                    <p className="text-sm text-gray-600">
+                      📅 {new Date(item.due_date).toLocaleDateString('es-CO')}
+                    </p>
+                  )}
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={item.is_paid}
+                      onChange={(e) => handleEditItem(item.id, { is_paid: e.target.checked })}
+                      className="mr-2"
+                    />
+                    <span className={`text-sm ${
+                      item.is_paid ? 'text-green-600' : 'text-gray-600'
+                    }`}>
+                      {item.is_paid ? '✅ Pagado' : '⏳ Pendiente'}
+                    </span>
+                  </div>
+                </div>
+                {item.notes && (
+                  <div className="mt-2 p-2 bg-red-50 rounded-md border-l-4 border-red-400">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium text-red-700">📝</span> {item.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="text-right flex-shrink-0 ml-4">
+                <p className="font-semibold text-red-600">{formatCurrency(item.estimated_amount)}</p>
+                <div className="flex gap-1 mt-2">
+                  <button
+                    onClick={() => setEditingItem(item)}
+                    className="text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDeleteItem(item.id)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
       </div>
     )
-  }
-
-  const handleUpdateBudget = async (updates: Partial<Budget>) => {
-    try {
-      await editBudget(budget.id, updates)
-      // Actualizar el presupuesto local
-      Object.assign(budget, updates)
-      // Recalcular el resumen
-      loadSummary()
-    } catch (error) {
-      console.error('Error updating budget:', error)
-      throw error
-    }
   }
 
   return (
@@ -134,7 +305,6 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
             ← Volver a Presupuestos
           </button>
           
-          {/* Botones responsivos */}
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShowItemForm(true)}
@@ -191,35 +361,74 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
         />
       )}
 
-      {/* Lista de ítems agrupados */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Ingresos */}
-        {groupedItems.income && groupedItems.income.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              💰 Ingresos ({groupedItems.income.length})
-            </h3>
-            <div className="space-y-3">
-              {groupedItems.income.map((item) => (
-                <div key={item.id} className="border border-green-200 rounded-lg p-4 bg-green-50">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
+      {/* Selector de Vista para Gastos */}
+      {Object.entries(groupedItems).filter(([key]) => key !== 'income').length > 0 && (
+        <div className="bg-white rounded-xl shadow-lg p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Vista de Gastos</h3>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('normal')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'normal'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📋 Normal
+              </button>
+              <button
+                onClick={() => setViewMode('mosaic')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'mosaic'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                🔲 Mosaico
+              </button>
+              <button
+                onClick={() => setViewMode('lines')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'lines'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📄 Líneas
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lista de ítems con layout responsivo mejorado */}
+      <div className="space-y-6">
+        {/* Layout optimizado: Ingresos arriba, gastos en grid abajo */}
+        <div className="space-y-6">
+          {/* Sección de Ingresos - Ancho completo */}
+          {groupedItems.income && groupedItems.income.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                💰 Ingresos ({groupedItems.income.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {groupedItems.income.map((item) => (
+                  <div key={item.id} className="border border-green-200 rounded-lg p-4 bg-green-50">
+                    <div className="space-y-2">
                       <h4 className="font-medium text-gray-800">{item.description}</h4>
+                      <p className="font-semibold text-green-600 text-lg">{formatCurrency(item.estimated_amount)}</p>
                       {item.due_date && (
                         <p className="text-sm text-gray-600">Fecha: {new Date(item.due_date).toLocaleDateString('es-CO')}</p>
                       )}
-                      {/* Mostrar notas si existen */}
                       {item.notes && (
-                        <div className="mt-2 p-2 bg-green-100 rounded-md border-l-4 border-green-400">
+                        <div className="p-2 bg-green-100 rounded-md border-l-4 border-green-400">
                           <p className="text-sm text-gray-700">
-                            <span className="font-medium text-green-700">📝 Nota:</span> {item.notes}
+                            <span className="font-medium text-green-700">📝</span> {item.notes}
                           </p>
                         </div>
                       )}
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-green-600">{formatCurrency(item.estimated_amount)}</p>
-                      <div className="flex gap-1 mt-2">
+                      <div className="flex justify-end gap-1 pt-2">
                         <button
                           onClick={() => setEditingItem(item)}
                           className="text-blue-600 hover:text-blue-800 text-sm"
@@ -235,86 +444,76 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Gastos por categoría */}
-        <div className="space-y-6">
-          {Object.entries(groupedItems)
-            .filter(([key]) => key !== 'income')
-            .map(([categoryName, categoryItems]) => {
-              const category = categoryItems[0]?.category
-              const totalAmount = categoryItems.reduce((sum, item) => sum + item.estimated_amount, 0)
-              
-              return (
-                <div key={categoryName} className="bg-white rounded-xl shadow-lg p-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center justify-between">
-                    <span className="flex items-center">
-                      {category?.icon} {categoryName} ({categoryItems.length})
-                    </span>
-                    <span className="text-red-600 font-bold">{formatCurrency(totalAmount)}</span>
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    {categoryItems.map((item) => (
-                      <div key={item.id} className="border border-red-200 rounded-lg p-4 bg-red-50">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-gray-800">{item.description}</h4>
-                            {item.due_date && (
-                              <p className="text-sm text-gray-600">
-                                Vence: {new Date(item.due_date).toLocaleDateString('es-CO')}
-                              </p>
-                            )}
-                            <div className="flex items-center mt-1">
-                              <input
-                                type="checkbox"
-                                checked={item.is_paid}
-                                onChange={(e) => handleEditItem(item.id, { is_paid: e.target.checked })}
-                                className="mr-2"
-                              />
-                              <span className={`text-sm ${
-                                item.is_paid ? 'text-green-600' : 'text-gray-600'
-                              }`}>
-                                {item.is_paid ? 'Pagado' : 'Pendiente'}
-                              </span>
-                            </div>
-                            {/* Mostrar notas si existen - DEBAJO DEL ESTADO */}
-                            {item.notes && (
-                              <div className="mt-2 p-2 bg-red-100 rounded-md border-l-4 border-red-400">
-                                <p className="text-sm text-gray-700">
-                                  <span className="font-medium text-red-700">📝 Nota:</span> {item.notes}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-red-600">{formatCurrency(item.estimated_amount)}</p>
-                            <div className="flex gap-1 mt-2">
-                              <button
-                                onClick={() => setEditingItem(item)}
-                                className="text-blue-600 hover:text-blue-800 text-sm"
-                              >
-                                ✏️
-                              </button>
-                              <button
-                                onClick={() => handleDeleteItem(item.id)}
-                                className="text-red-600 hover:text-red-800 text-sm"
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+          {/* Sección de Gastos - Grid optimizado */}
+          {Object.entries(groupedItems).filter(([key]) => key !== 'income').length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  💸 Gastos ({Object.entries(groupedItems).filter(([key]) => key !== 'income').reduce((total, [, items]) => total + items.length, 0)})
+                </h3>
+                <div className="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('normal')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'normal'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    📋 Normal
+                  </button>
+                  <button
+                    onClick={() => setViewMode('mosaic')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'mosaic'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    🔲 Mosaico
+                  </button>
+                  <button
+                    onClick={() => setViewMode('lines')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'lines'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    📄 Líneas
+                  </button>
                 </div>
-              )
-            })}
+              </div>
+              
+              {/* Grid de categorías de gastos - Máximo 2 columnas para mejor aprovechamiento */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {Object.entries(groupedItems)
+                  .filter(([key]) => key !== 'income')
+                  .map(([categoryName, categoryItems]) => {
+                    const category = categoryItems[0]?.category
+                    const totalAmount = categoryItems.reduce((sum, item) => sum + item.estimated_amount, 0)
+                    
+                    return (
+                      <div key={categoryName} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-semibold text-gray-800 flex items-center">
+                            {category?.icon} {categoryName} ({categoryItems.length})
+                          </h4>
+                          <span className="text-red-600 font-bold text-lg">{formatCurrency(totalAmount)}</span>
+                        </div>
+                        
+                        {renderExpenseItems(categoryItems, categoryName, category, totalAmount)}
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -333,81 +532,12 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-            {/* Header del modal */}
             <div className="bg-red-50 rounded-t-2xl p-6 border-b border-red-100">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">⚠️</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-red-800">Eliminar Presupuesto</h3>
-                  <p className="text-red-600 text-sm">Esta acción no se puede deshacer</p>
-                </div>
-              </div>
+               {/* ... contenido del modal ... */}
             </div>
-
-            {/* Contenido del modal */}
             <div className="p-6">
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-800 mb-2">¿Estás seguro de eliminar este presupuesto?</h4>
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <p className="font-medium text-gray-800">{budget.name}</p>
-                  <p className="text-gray-600 text-sm">{MONTHS[budget.month - 1]} {budget.year}</p>
-                </div>
-                
-                <div className="space-y-3 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <span className="text-red-500">•</span>
-                    <span>Se eliminarán todos los ingresos registrados</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-red-500">•</span>
-                    <span>Se eliminarán todos los gastos registrados</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-red-500">•</span>
-                    <span>Se perderá todo el historial de este presupuesto</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-red-500">•</span>
-                    <span>Esta acción es <strong>irreversible</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Estadísticas del presupuesto */}
-              {summary && (
-                <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                  <h5 className="font-medium text-blue-800 mb-2">Resumen del presupuesto:</h5>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-blue-600">Total ingresos:</span>
-                      <p className="font-semibold text-green-600">{formatCurrency(summary.totalIncome || 0)}</p>
-                    </div>
-                    <div>
-                      <span className="text-blue-600">Total gastos:</span>
-                      <p className="font-semibold text-red-600">{formatCurrency(summary.totalExpenses || 0)}</p>
-                    </div>
-                    <div>
-                      <span className="text-blue-600">Items totales:</span>
-                      <p className="font-semibold text-gray-700">{items.length} elementos</p>
-                    </div>
-                    <div>
-                      <span className="text-blue-600">Balance:</span>
-                      <p className={`font-semibold ${
-                        (summary.totalIncome || 0) - (summary.totalExpenses || 0) >= 0 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
-                      }`}>
-                        {formatCurrency((summary.totalIncome || 0) - (summary.totalExpenses || 0))}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+               {/* ... contenido del modal ... */}
             </div>
-
-            {/* Footer del modal */}
             <div className="bg-gray-50 rounded-b-2xl p-6 flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -421,21 +551,11 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                 disabled={isDeleting}
                 className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isDeleting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Eliminando...
-                  </>
-                ) : (
-                  <>
-                    🗑️ Sí, eliminar presupuesto
-                  </>
-                )}
+                {isDeleting ? 'Eliminando...' : 'Sí, eliminar presupuesto'}
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  )}

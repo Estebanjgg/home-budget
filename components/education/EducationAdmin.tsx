@@ -215,8 +215,8 @@ export function EducationAdmin({ onClose }: EducationAdminProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="bg-white rounded-3xl shadow-2xl border-2 border-blue-500 w-full max-w-6xl max-h-[90vh] overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold flex items-center">

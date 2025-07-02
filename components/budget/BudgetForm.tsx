@@ -18,42 +18,56 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
   const currentDate = new Date()
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
-    month: initialData?.month || currentDate.getMonth() + 1,
-    year: initialData?.year || currentDate.getFullYear(),
-    gross_income: initialData?.gross_income || 0,
-    tithe_percentage: initialData?.tithe_percentage || 10,
+    month: initialData?.month || new Date().getMonth() + 1,
+    year: initialData?.year || new Date().getFullYear(),
+    gross_income: initialData?.gross_income ? initialData.gross_income.toLocaleString('es-CO') : '',
     tithe_enabled: initialData?.tithe_enabled || false,
-    savings_amount: initialData?.savings_amount || 0
+    tithe_percentage: initialData?.tithe_percentage || 10,
+    savings_amount: initialData?.savings_amount ? initialData.savings_amount.toLocaleString('es-CO') : ''
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es requerido'
-    }
-
-    if (formData.gross_income < 0) {
-      newErrors.gross_income = 'Los ingresos no pueden ser negativos'
-    }
-
-    if (formData.tithe_percentage < 0 || formData.tithe_percentage > 100) {
-      newErrors.tithe_percentage = 'El porcentaje debe estar entre 0 y 100'
-    }
-
-    if (formData.savings_amount < 0) {
-      newErrors.savings_amount = 'Los ahorros no pueden ser negativos'
-    }
-
-    if (formData.savings_amount > formData.gross_income) {
-      newErrors.savings_amount = 'Los ahorros no pueden ser mayores a los ingresos'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+  const formatNumber = (value: string) => {
+    // Remover todo excepto números
+    const numericValue = value.replace(/[^\d]/g, '')
+    if (!numericValue) return ''
+    
+    // Formatear con separadores de miles
+    return parseInt(numericValue).toLocaleString('es-CO')
   }
+
+  const parseFormattedNumber = (value: string) => {
+    // Convertir el valor formateado de vuelta a número
+    const numericValue = value.replace(/[^\d]/g, '')
+    return numericValue ? parseInt(numericValue) : 0
+  }
+
+  const grossIncomeValue = parseFormattedNumber(formData.gross_income.toString())
+  const savingsAmountValue = parseFormattedNumber(formData.savings_amount.toString())
+
+  const validateForm = () => {
+  const newErrors: Record<string, string> = {}
+
+  if (!formData.name.trim()) {
+    newErrors.name = 'El nombre es requerido'
+  }
+
+  if (formData.tithe_enabled && (formData.tithe_percentage < 0 || formData.tithe_percentage > 100)) {
+    newErrors.tithe_percentage = 'El porcentaje debe estar entre 0 y 100'
+  }
+
+  if (grossIncomeValue < 0) {
+    newErrors.gross_income = 'Los ingresos no pueden ser negativos'
+  }
+
+  if (savingsAmountValue > grossIncomeValue) {
+    newErrors.savings_amount = 'Los ahorros no pueden ser mayores a los ingresos'
+  }
+
+  setErrors(newErrors)
+  return Object.keys(newErrors).length === 0
+}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,9 +76,15 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
 
     setLoading(true)
     try {
-      await onSubmit(formData)
+      // Convertir los valores formateados de vuelta a números para enviar
+      const submitData = {
+        ...formData,
+        gross_income: grossIncomeValue,
+        savings_amount: savingsAmountValue
+      }
+      await onSubmit(submitData)
     } catch (error) {
-      console.error('Error submitting form:', error)
+      console.error('Error al guardar presupuesto:', error)
     } finally {
       setLoading(false)
     }
@@ -77,8 +97,16 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
     }
   }
 
-  const titheAmount = formData.tithe_enabled ? (formData.gross_income * formData.tithe_percentage / 100) : 0
-  const availableAmount = formData.gross_income - titheAmount - formData.savings_amount
+  const handleMoneyInputChange = (field: string, value: string) => {
+    const formattedValue = formatNumber(value)
+    setFormData(prev => ({ ...prev, [field]: formattedValue }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const titheAmount = formData.tithe_enabled ? (grossIncomeValue * formData.tithe_percentage / 100) : 0
+  const availableAmount = grossIncomeValue - titheAmount - savingsAmountValue
 
   return (
     <div className="bg-white rounded-xl shadow-lg max-w-2xl mx-auto">
@@ -144,15 +172,13 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
           <div className="relative">
             <span className="absolute left-3 top-2 text-gray-500">$</span>
             <input
-              type="number"
+              type="text"
               value={formData.gross_income}
-              onChange={(e) => handleInputChange('gross_income', parseFloat(e.target.value) || 0)}
+              onChange={(e) => handleMoneyInputChange('gross_income', e.target.value)}
               className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.gross_income ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="0"
-              min="0"
-              step="0.01"
+              placeholder="Ingresa tu salario mensual"
             />
           </div>
           {errors.gross_income && <p className="text-red-500 text-sm mt-1">{errors.gross_income}</p>}
@@ -206,15 +232,13 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
           <div className="relative">
             <span className="absolute left-3 top-2 text-gray-500">$</span>
             <input
-              type="number"
+              type="text"
               value={formData.savings_amount}
-              onChange={(e) => handleInputChange('savings_amount', parseFloat(e.target.value) || 0)}
+              onChange={(e) => handleMoneyInputChange('savings_amount', e.target.value)}
               className={`w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                 errors.savings_amount ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="0"
-              min="0"
-              step="0.01"
+              placeholder="Cuánto quieres ahorrar"
             />
           </div>
           {errors.savings_amount && <p className="text-red-500 text-sm mt-1">{errors.savings_amount}</p>}
@@ -226,7 +250,7 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Ingresos Brutos:</span>
-              <span className="font-medium">${formData.gross_income.toLocaleString('es-CO')}</span>
+              <span className="font-medium">${grossIncomeValue.toLocaleString('es-CO')}</span>
             </div>
             {formData.tithe_enabled && (
               <div className="flex justify-between">
@@ -236,7 +260,7 @@ export function BudgetForm({ onSubmit, onCancel, initialData }: BudgetFormProps)
             )}
             <div className="flex justify-between">
               <span className="text-gray-600">Ahorros:</span>
-              <span className="font-medium text-purple-600">-${formData.savings_amount.toLocaleString('es-CO')}</span>
+              <span className="font-medium text-purple-600">-${savingsAmountValue.toLocaleString('es-CO')}</span>
             </div>
             <div className="border-t pt-2 flex justify-between">
               <span className="font-semibold text-gray-800">Disponible para Gastos:</span>

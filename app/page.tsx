@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import Auth from '@/components/auth/Auth'
 import UserProfile from '@/components/user/UserProfile'
@@ -18,6 +18,19 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets' | 'grocery'>('dashboard')
+
+  // Escuchar eventos de cambio de tab desde el Dashboard
+  useEffect(() => {
+    const handleTabChange = (event: CustomEvent) => {
+      setActiveTab(event.detail as 'dashboard' | 'budgets' | 'grocery')
+    }
+
+    window.addEventListener('changeTab', handleTabChange as EventListener)
+    
+    return () => {
+      window.removeEventListener('changeTab', handleTabChange as EventListener)
+    }
+  }, [])
 
   if (loading) {
     return (

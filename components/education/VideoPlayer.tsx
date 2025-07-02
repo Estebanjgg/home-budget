@@ -39,8 +39,8 @@ export function VideoPlayer({ url, title, onClose }: VideoPlayerProps) {
   const isDirectVideo = url.includes('.mp4') || url.includes('.webm') || url.includes('.ogg')
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-2xl border-2 border-red-500 w-full max-w-5xl max-h-[90vh] overflow-hidden">
         <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold flex items-center">

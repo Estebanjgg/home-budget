@@ -15,7 +15,60 @@ export default function GroceryItemEditor({ item, onSave, onCancel }: GroceryIte
     notes: item.notes || '',
     priority: item.priority
   });
+  const [priceDisplay, setPriceDisplay] = useState<string>(item.unit_price.toFixed(2));
   const [saving, setSaving] = useState(false);
+
+  // Funciones de formateo para precios de supermercado
+  const formatGroceryPrice = (value: number): string => {
+    if (value === 0) return '';
+    return value.toFixed(2);
+  };
+
+  const parseGroceryPrice = (value: string): number => {
+    const cleaned = value.replace(/[^0-9.]/g, '');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    if (value === '') {
+      setPriceDisplay('');
+      setFormData({ ...formData, unit_price: 0 });
+      return;
+    }
+    
+    // Remover caracteres no numéricos excepto punto
+    value = value.replace(/[^0-9.]/g, '');
+    
+    // Asegurar solo un punto decimal
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Limitar a 2 decimales
+    if (parts[1] && parts[1].length > 2) {
+      value = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    setPriceDisplay(value);
+    const numericValue = parseGroceryPrice(value);
+    setFormData({ ...formData, unit_price: numericValue });
+  };
+  
+  const handlePriceBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && !value.includes('.')) {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue > 0) {
+        const formattedValue = numValue.toFixed(2);
+        setPriceDisplay(formattedValue);
+        setFormData({ ...formData, unit_price: numValue });
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +82,8 @@ export default function GroceryItemEditor({ item, onSave, onCancel }: GroceryIte
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl shadow-2xl border-2 border-blue-500 max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Editar Producto</h3>
           
@@ -69,11 +122,16 @@ export default function GroceryItemEditor({ item, onSave, onCancel }: GroceryIte
                   Precio Unitario
                 </label>
                 <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.unit_price}
-                  onChange={(e) => setFormData({ ...formData, unit_price: parseFloat(e.target.value) || 0 })}
+                  type="text"
+                  placeholder="0.00"
+                  value={priceDisplay}
+                  onChange={handlePriceInputChange}
+                  onBlur={handlePriceBlur}
+                  onFocus={(e) => {
+                    if (priceDisplay === '') {
+                      e.target.select();
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />

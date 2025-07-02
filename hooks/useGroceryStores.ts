@@ -183,20 +183,27 @@ export function useGroceryStores() {
   };
 
   // Agregar producto
-  const addItem = async (monthId: string, storeId: string, productName: string, quantity: number, unitPrice: number) => {
+  const addItem = async (monthId: string, storeId: string, productName: string, quantity: number, unitPrice: number, notes?: string) => {
     if (!user) return null;
 
     try {
+      const insertData: any = {
+        user_id: user.id,
+        month_id: monthId,
+        store_id: storeId,
+        product_name: productName,
+        quantity,
+        unit_price: unitPrice
+      };
+      
+      // Solo agregar notas si se proporciona
+      if (notes && notes.trim()) {
+        insertData.notes = notes.trim();
+      }
+      
       const { data, error } = await supabase
         .from('grocery_items')
-        .insert({
-          user_id: user.id,
-          month_id: monthId,
-          store_id: storeId,
-          product_name: productName,
-          quantity,
-          unit_price: unitPrice
-        })
+        .insert(insertData)
         .select()
         .single();
 

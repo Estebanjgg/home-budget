@@ -12,11 +12,26 @@ interface BudgetItemFormProps {
 }
 
 export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initialData }: BudgetItemFormProps) {
+  const formatNumber = (value: string) => {
+    // Remover todo excepto números
+    const numericValue = value.replace(/[^\d]/g, '')
+    if (!numericValue) return ''
+    
+    // Formatear con separadores de miles
+    return parseInt(numericValue).toLocaleString('es-CO')
+  }
+
+  const parseFormattedNumber = (value: string) => {
+    // Convertir el valor formateado de vuelta a número
+    const numericValue = value.replace(/[^\d]/g, '')
+    return numericValue ? parseInt(numericValue) : 0
+  }
+
   const [formData, setFormData] = useState({
     budget_id: budgetId,
     type: (initialData?.type || 'expense') as 'income' | 'expense',
     description: initialData?.description || '',
-    estimated_amount: initialData?.estimated_amount || 0,
+    estimated_amount: initialData?.estimated_amount ? initialData.estimated_amount.toLocaleString('es-CO') : '',
     actual_amount: initialData?.actual_amount || null,
     due_date: initialData?.due_date || '',
     is_paid: initialData?.is_paid || false,
@@ -26,6 +41,9 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Calcular valores numéricos para validación
+  const estimatedAmountValue = parseFormattedNumber(formData.estimated_amount)
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -33,7 +51,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
       newErrors.description = 'La descripción es requerida'
     }
 
-    if (formData.estimated_amount <= 0) {
+    if (estimatedAmountValue <= 0) {
       newErrors.estimated_amount = 'El monto debe ser mayor a 0'
     }
 
@@ -54,6 +72,7 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
     try {
       const submitData = {
         ...formData,
+        estimated_amount: estimatedAmountValue,
         category_id: formData.type === 'income' ? null : formData.category_id || null,
         due_date: formData.due_date || null,
         notes: formData.notes || null  // Incluir notas en el envío
@@ -73,9 +92,17 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
     }
   }
 
+  const handleMoneyInputChange = (field: string, value: string) => {
+    const formattedValue = formatNumber(value)
+    setFormData(prev => ({ ...prev, [field]: formattedValue }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-xs sm:max-w-md lg:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-xl shadow-2xl border-2 border-blue-500 w-full max-w-xs sm:max-w-md lg:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <div className={`p-4 sm:p-6 rounded-t-xl text-white ${
           formData.type === 'income' 
             ? 'bg-gradient-to-r from-green-600 to-emerald-600'
@@ -166,15 +193,13 @@ export function BudgetItemForm({ budgetId, categories, onSubmit, onCancel, initi
             <div className="relative">
               <span className="absolute left-3 top-2 text-gray-500 text-sm sm:text-base">$</span>
               <input
-                type="number"
+                type="text"
                 value={formData.estimated_amount}
-                onChange={(e) => handleInputChange('estimated_amount', parseFloat(e.target.value) || 0)}
+                onChange={(e) => handleMoneyInputChange('estimated_amount', e.target.value)}
                 className={`w-full pl-8 pr-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   errors.estimated_amount ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="0"
-                min="0"
-                step="0.01"
+                placeholder="Ej: 50000"
               />
             </div>
             {errors.estimated_amount && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.estimated_amount}</p>}

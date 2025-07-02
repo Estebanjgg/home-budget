@@ -530,8 +530,8 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border-2 border-red-500 max-w-md w-full mx-4 transform transition-all">
             <div className="bg-red-50 rounded-t-2xl p-6 border-b border-red-100">
                {/* ... contenido del modal ... */}
             </div>

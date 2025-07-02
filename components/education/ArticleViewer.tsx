@@ -11,8 +11,8 @@ export function ArticleViewer({ article, onClose }: ArticleViewerProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl shadow-2xl border-2 border-blue-500 max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
           <div className="flex items-center justify-between">

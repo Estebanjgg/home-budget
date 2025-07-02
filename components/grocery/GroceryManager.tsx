@@ -47,7 +47,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const [newProduct, setNewProduct] = useState({ 
     name: '', 
     quantity: 1, 
-    price: 0, 
+    price: '', 
     notes: '', 
     priority: 2 
   });
@@ -58,6 +58,12 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const [monthToDelete, setMonthToDelete] = useState<{id: string, name: string} | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
+  // Estados para confirmación de eliminación de productos y supermercados
+  const [showDeleteItemConfirm, setShowDeleteItemConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{id: string, name: string} | null>(null);
+  const [showDeleteStoreConfirm, setShowDeleteStoreConfirm] = useState(false);
+  const [storeToDelete, setStoreToDelete] = useState<{id: string, name: string} | null>(null);
   
   // Nuevos estados para sugerencias y duplicados
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -141,17 +147,19 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     setIsAddingProduct(true);
     
     try {
+      const priceValue = parseGroceryPrice(newProduct.price.toString());
       const item = await addItem(
         currentMonth.id,
         selectedStoreId,
         newProduct.name.trim(),
         newProduct.quantity,
-        newProduct.price
+        priceValue,
+        newProduct.notes
       );
 
       if (item) {
         // Limpiar formulario
-        setNewProduct({ name: '', quantity: 1, price: 0, notes: '', priority: 2 });
+        setNewProduct({ name: '', quantity: 1, price: '', notes: '', priority: 2 });
         setSelectedStoreId('');
         setDuplicateWarning({ show: false, message: '' });
         setShowSuggestions(false);
@@ -200,11 +208,71 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     }
   };
 
+  // Funciones de formateo para precios de supermercado
+  const formatGroceryPrice = (value: number): string => {
+    if (value === 0) return '';
+    return value.toFixed(2);
+  };
+
+  const parseGroceryPrice = (value: string): number => {
+    const cleaned = value.replace(/[^0-9.]/g, '');
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    
+    if (value === '') {
+      setNewProduct({ ...newProduct, price: '' });
+      return;
+    }
+    
+    // Remover caracteres no numéricos excepto punto
+    value = value.replace(/[^0-9.]/g, '');
+    
+    // Asegurar solo un punto decimal
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Limitar a 2 decimales
+    if (parts[1] && parts[1].length > 2) {
+      value = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    // Formatear automáticamente con decimales cuando sea apropiado
+    let formattedValue = value;
+    
+    // Si el usuario termina de escribir un número entero, agregar .00
+    if (value && !value.includes('.') && value.length > 0) {
+      // Solo formatear si el campo pierde el foco o si es un número completo
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue > 0) {
+        // No formatear automáticamente mientras escribe, solo al perder foco
+        formattedValue = value;
+      }
+    }
+    
+    setNewProduct({ ...newProduct, price: formattedValue });
+  };
+  
+  const handlePriceBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && !value.includes('.')) {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue > 0) {
+        setNewProduct({ ...newProduct, price: numValue.toFixed(2) });
+      }
+    }
+  };
+
   const handleSuggestionClick = (suggestion: any) => {
     setNewProduct({
       name: suggestion.product_name,
       quantity: suggestion.avg_quantity,
-      price: suggestion.avg_price,
+      price: formatGroceryPrice(suggestion.avg_price),
       notes: '',
       priority: 2
     });
@@ -286,6 +354,56 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const cancelDeleteMonth = () => {
     setShowDeleteConfirm(false);
     setMonthToDelete(null);
+  };
+
+  // Funciones para manejar eliminación de productos
+  const handleDeleteItem = (itemId: string, itemName: string) => {
+    setItemToDelete({ id: itemId, name: itemName });
+    setShowDeleteItemConfirm(true);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await deleteItem(itemToDelete.id);
+      setShowDeleteItemConfirm(false);
+      setItemToDelete(null);
+    } catch (err) {
+      console.error('Error al eliminar producto:', err);
+      setShowDeleteItemConfirm(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const cancelDeleteItem = () => {
+    setShowDeleteItemConfirm(false);
+    setItemToDelete(null);
+  };
+
+  // Funciones para manejar eliminación de supermercados
+  const handleDeleteStore = (storeId: string, storeName: string) => {
+    setStoreToDelete({ id: storeId, name: storeName });
+    setShowDeleteStoreConfirm(true);
+  };
+
+  const confirmDeleteStore = async () => {
+    if (!storeToDelete) return;
+    
+    try {
+      await deleteStore(storeToDelete.id);
+      setShowDeleteStoreConfirm(false);
+      setStoreToDelete(null);
+    } catch (err) {
+      console.error('Error al eliminar supermercado:', err);
+      setShowDeleteStoreConfirm(false);
+      setStoreToDelete(null);
+    }
+  };
+
+  const cancelDeleteStore = () => {
+    setShowDeleteStoreConfirm(false);
+    setStoreToDelete(null);
   };
 
   const filteredAndSortedItems = (items: GroceryItem[]) => {
@@ -425,8 +543,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
 
         {/* Modales */}
         {showCreateMonth && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-2xl border-2 border-blue-500 p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold mb-4">Crear Nuevo Mes</h3>
               <form onSubmit={handleCreateMonth}>
                 <div className="mb-4">
@@ -463,8 +581,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
         )}
 
         {showCreateStore && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-2xl border-2 border-green-500 p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold mb-4">Crear Nuevo Supermercado</h3>
               <form onSubmit={handleCreateStore}>
                 <div className="mb-4">
@@ -839,7 +957,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 placeholder="1"
                 min="1"
                 step="1"
-                value={newProduct.quantity === 1 ? '' : newProduct.quantity}
+                value={newProduct.quantity}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value === '') {
@@ -850,9 +968,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                   }
                 }}
                 onFocus={(e) => {
-                  if (newProduct.quantity === 1) {
-                    e.target.select();
-                  }
+                  e.target.select();
                 }}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
@@ -865,27 +981,32 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 Precio Unitario ($)
               </label>
               <input
-                type="number"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                value={newProduct.price === 0 ? '' : newProduct.price}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    setNewProduct({ ...newProduct, price: 0 });
-                  } else {
-                    const numValue = parseFloat(value);
-                    setNewProduct({ ...newProduct, price: numValue >= 0 ? numValue : 0 });
-                  }
-                }}
-                onFocus={(e) => {
-                  if (newProduct.price === 0) {
-                    e.target.select();
-                  }
-                }}
+                  type="text"
+                  placeholder="0.00"
+                  value={newProduct.price}
+                  onChange={handlePriceInputChange}
+                  onBlur={handlePriceBlur}
+                  onFocus={(e) => {
+                    if (newProduct.price === '') {
+                      e.target.select();
+                    }
+                  }}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
+                disabled={isAddingProduct}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notas (opcional)
+              </label>
+              <textarea
+                value={newProduct.notes}
+                onChange={(e) => setNewProduct({ ...newProduct, notes: e.target.value })}
+                rows={2}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                placeholder="Marca específica, tamaño, etc..."
                 disabled={isAddingProduct}
               />
             </div>
@@ -931,12 +1052,12 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           )}
           
           {/* Mostrar total calculado */}
-          {(newProduct.quantity > 0 && newProduct.price > 0) && (
+          {(newProduct.quantity > 0 && parseGroceryPrice(newProduct.price.toString()) > 0) && (
             <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-green-700">💰 Total calculado:</span>
                 <span className="font-bold text-green-800">
-                  ${(newProduct.quantity * newProduct.price).toFixed(2)}
+                  ${(newProduct.quantity * parseGroceryPrice(newProduct.price.toString())).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -961,7 +1082,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                       {storeItems.length} productos
                     </span>
                     <button
-                      onClick={() => deleteStore(store.id)}
+                      onClick={() => handleDeleteStore(store.id, store.name)}
                       className="text-red-200 hover:text-red-100 transition-colors"
                       title="Eliminar supermercado"
                     >
@@ -1034,7 +1155,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                             ✏️
                           </button>
                           <button
-                            onClick={() => deleteItem(item.id)}
+                            onClick={() => handleDeleteItem(item.id, item.product_name)}
                             className="text-red-600 hover:text-red-800 transition-colors"
                             title="Eliminar producto"
                           >
@@ -1067,8 +1188,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       
       {/* Modales existentes */}
       {showCreateMonth && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-2xl border-2 border-blue-200 pointer-events-auto">
             <h3 className="text-lg font-semibold mb-4">Crear Nuevo Mes</h3>
             <form onSubmit={handleCreateMonth}>
               <div className="mb-4">
@@ -1105,8 +1226,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       )}
       
       {showCreateStore && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-2xl border-2 border-green-200 pointer-events-auto">
             <h3 className="text-lg font-semibold mb-4">Crear Nuevo Supermercado</h3>
             <form onSubmit={handleCreateStore}>
               <div className="mb-4">
@@ -1152,8 +1273,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       
       {/* Modal de confirmación para eliminar mes */}
       {showDeleteConfirm && monthToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all border-2 border-red-200 pointer-events-auto">
             <div className="p-6">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
                 <span className="text-3xl">🗑️</span>
@@ -1180,6 +1301,86 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 </button>
                 <button
                   onClick={confirmDeleteMonth}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal de confirmación para eliminar producto */}
+      {showDeleteItemConfirm && itemToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all border-2 border-red-200 pointer-events-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                <span className="text-3xl">🗑️</span>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                Eliminar Producto
+              </h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                ¿Estás seguro de que quieres eliminar el producto <strong>"{itemToDelete.name}"</strong>?
+                <br />
+                <span className="text-red-600 font-medium">
+                  Esta acción no se puede deshacer.
+                </span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={cancelDeleteItem}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteItem}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal de confirmación para eliminar supermercado */}
+      {showDeleteStoreConfirm && storeToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all border-2 border-red-200 pointer-events-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                <span className="text-3xl">🏪</span>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                Eliminar Supermercado
+              </h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                ¿Estás seguro de que quieres eliminar el supermercado <strong>"{storeToDelete.name}"</strong>?
+                <br />
+                <span className="text-red-600 font-medium">
+                  Esta acción eliminará todos los productos de este supermercado y no se puede deshacer.
+                </span>
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={cancelDeleteStore}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteStore}
                   className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                 >
                   Sí, Eliminar

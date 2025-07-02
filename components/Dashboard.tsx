@@ -170,6 +170,236 @@ export function Dashboard() {
     )
   }
 
+  // Si no hay presupuestos, mostrar pantalla de bienvenida
+  if (budgets.length === 0) {
+    return (
+      <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
+        {showAdminPanel && (
+          <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+        )}
+
+        {/* Sección de Bienvenida para Usuarios Nuevos */}
+        <div className="text-center bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+          <div className="flex items-center justify-center mb-6">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-4 mr-4">
+              <span className="text-4xl">🎉</span>
+            </div>
+            <div>
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                ¡Bienvenido a tu Dashboard Financiero!
+              </h1>
+              <p className="text-xl text-gray-600">Comienza tu viaje hacia la libertad financiera</p>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center justify-center">
+              <span className="text-3xl mr-3">🚀</span>
+              ¿Listo para tomar control de tus finanzas?
+            </h2>
+            <p className="text-lg text-gray-700 mb-6">
+              Te ayudamos a organizar tus gastos, planificar tus compras de supermercado y alcanzar tus metas financieras.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-blue-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="text-center">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-2xl text-white">💰</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">Crear tu Primer Presupuesto</h3>
+                  <p className="text-gray-600 mb-4">Registra tus ingresos y gastos para tener un control total de tu dinero</p>
+                  <button 
+                     onClick={() => {
+                       // Buscar el componente padre que tiene setActiveTab
+                       const event = new CustomEvent('changeTab', { detail: 'budgets' });
+                       window.dispatchEvent(event);
+                     }}
+                     className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
+                   >
+                     🎯 Crear Presupuesto
+                   </button>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-green-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="text-center">
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-2xl text-white">🛒</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">Organizar Compras de Supermercado</h3>
+                  <p className="text-gray-600 mb-4">Planifica tus compras, compara precios y ahorra dinero en cada visita</p>
+                  <button 
+                     onClick={() => {
+                       // Buscar el componente padre que tiene setActiveTab
+                       const event = new CustomEvent('changeTab', { detail: 'grocery' });
+                       window.dispatchEvent(event);
+                     }}
+                     className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105"
+                   >
+                     🛍️ Gestionar Compras
+                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-center space-x-8 mt-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">0</div>
+              <div className="text-sm text-gray-500">Presupuestos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">100%</div>
+              <div className="text-sm text-gray-500">Potencial</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">∞</div>
+              <div className="text-sm text-gray-500">Posibilidades</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección de Educación Financiera para Usuarios Nuevos */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+          <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center">
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-3 mr-4">
+              📚
+            </span>
+            Aprende Mientras Empiezas
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {educationalContent.slice(0, 4).map((content) => (
+              <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
+                <div className="mb-4">
+                  {content.image_url ? (
+                    <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
+                      <img 
+                        src={content.image_url} 
+                        alt={content.title}
+                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (nextElement) {
+                            nextElement.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
+                        <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                      <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      content.type === 'video' 
+                        ? 'bg-red-100 text-red-700' 
+                        : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {content.type === 'video' ? '📹 Video' : '📄 Artículo'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex-grow">
+                  <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
+                    {content.title}
+                  </h4>
+                  
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-4">
+                    {content.summary || 'Contenido educativo disponible para mejorar tus conocimientos financieros.'}
+                  </p>
+                </div>
+                
+                <div className="mt-auto">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                      content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
+                      content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
+                      content.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
+                      'bg-orange-100 text-orange-700'
+                    }`}>
+                      {content.category}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {content.type === 'video' ? content.duration : content.duration}
+                    </span>
+                  </div>
+                  
+                  <button onClick={() => handleContentClick(content)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                    {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Sección de videos destacados para usuarios nuevos */}
+          <FeaturedVideos featuredContent={featuredContent} />
+        </div>
+
+        {/* Consejos Rápidos para Empezar */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+          <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center">
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-3 mr-4">
+              💡
+            </span>
+            Consejos para Empezar
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+              <div className="text-center">
+                <div className="text-4xl mb-4">📊</div>
+                <h4 className="text-xl font-bold text-gray-800 mb-3">1. Registra tus Ingresos</h4>
+                <p className="text-gray-600">Anota todos tus ingresos mensuales: salario, trabajos extras, inversiones, etc.</p>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+              <div className="text-center">
+                <div className="text-4xl mb-4">📝</div>
+                <h4 className="text-xl font-bold text-gray-800 mb-3">2. Lista tus Gastos</h4>
+                <p className="text-gray-600">Categoriza tus gastos: vivienda, alimentación, transporte, entretenimiento, etc.</p>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+              <div className="text-center">
+                <div className="text-4xl mb-4">🎯</div>
+                <h4 className="text-xl font-bold text-gray-800 mb-3">3. Define tus Metas</h4>
+                <p className="text-gray-600">Establece objetivos de ahorro y planifica cómo alcanzarlos mes a mes.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Renderizado condicional del VideoPlayer */}
+        {selectedVideo && (
+          <VideoPlayer
+            url={selectedVideo.url!}
+            title={selectedVideo.title}
+            onClose={() => setSelectedVideo(null)}
+          />
+        )}
+
+        {/* Renderizado condicional del ArticleViewer */}
+        {selectedArticle && (
+          <ArticleViewer
+            article={selectedArticle}
+            onClose={() => setSelectedArticle(null)}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
       {showAdminPanel && (

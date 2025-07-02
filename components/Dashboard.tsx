@@ -5,6 +5,7 @@ import { getBudgetItems } from '@/lib/budget-queries'
 import { EducationAdmin } from './education/EducationAdmin'
 import { FeaturedVideos } from './education/FeaturedVideos'
 import { VideoPlayer } from './education/VideoPlayer'
+import { ArticleViewer } from './education/ArticleViewer'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -28,6 +29,7 @@ export function Dashboard() {
   const [groceryMetrics, setGroceryMetrics] = useState<any>(null)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<EducationalContent | null>(null)
+  const [selectedArticle, setSelectedArticle] = useState<EducationalContent | null>(null)
 
   // Calcular métricas del dashboard
   const calculateDashboardMetrics = async () => {
@@ -139,6 +141,8 @@ export function Dashboard() {
   const handleContentClick = (contentItem: EducationalContentItem) => {
     if (contentItem.type === 'video' && contentItem.url) {
       setSelectedVideo(contentItem as EducationalContent)
+    } else if (contentItem.type === 'article') {
+      setSelectedArticle(contentItem as EducationalContent)
     } else if (contentItem.url) {
       window.open(contentItem.url, '_blank')
     }
@@ -416,10 +420,32 @@ export function Dashboard() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {educationalContent.map((content) => (
-                <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl">{content.image_emoji}</span>
-                    <div className="flex items-center space-x-2">
+                <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
+                  <div className="mb-4">
+                    {content.image_url ? (
+                      <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
+                        <img 
+                          src={content.image_url} 
+                          alt={content.title}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (nextElement) {
+                              nextElement.style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
+                          <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                         content.type === 'video' 
                           ? 'bg-red-100 text-red-700' 
@@ -430,31 +456,35 @@ export function Dashboard() {
                     </div>
                   </div>
                   
-                  <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
-                    {content.title}
-                  </h4>
-                  
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {content.summary}
-                  </p>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                      content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
-                      content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
-                      content.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {content.category}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {content.type === 'video' ? content.duration : content.duration}
-                    </span>
+                  <div className="flex-grow">
+                    <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
+                      {content.title}
+                    </h4>
+                    
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-4">
+                      {content.summary || 'Contenido educativo disponible para mejorar tus conocimientos financieros.'}
+                    </p>
                   </div>
                   
-                  <button onClick={() => handleContentClick(content)} className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
-                    {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
-                  </button>
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                        content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
+                        content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
+                        content.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {content.category}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {content.type === 'video' ? content.duration : content.duration}
+                      </span>
+                    </div>
+                    
+                    <button onClick={() => handleContentClick(content)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                      {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -542,12 +572,20 @@ export function Dashboard() {
         </>
       )}
 
-      {/* // CORREÇÃO: Adicionado o renderizado condicional do VideoPlayer aqui */}
+      {/* Renderizado condicional del VideoPlayer */}
       {selectedVideo && (
         <VideoPlayer
           url={selectedVideo.url!}
           title={selectedVideo.title}
           onClose={() => setSelectedVideo(null)}
+        />
+      )}
+
+      {/* Renderizado condicional del ArticleViewer */}
+      {selectedArticle && (
+        <ArticleViewer
+          article={selectedArticle}
+          onClose={() => setSelectedArticle(null)}
         />
       )}
     </div>

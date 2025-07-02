@@ -52,6 +52,7 @@ CREATE TABLE educational_content (
   category VARCHAR(50) NOT NULL,
   duration VARCHAR(20), -- Para videos: "12 min", para artículos: "5 min read"
   image_emoji VARCHAR(10) DEFAULT '📄',
+  image_url VARCHAR(500), -- URL de la imagen del artículo
   url VARCHAR(500), -- URL externa para videos
   is_featured BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,

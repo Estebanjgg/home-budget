@@ -65,6 +65,7 @@ export interface EducationalContent {
   category: string
   duration: string
   image_emoji: string
+  image_url?: string
   url?: string
   is_featured: boolean
   is_active: boolean

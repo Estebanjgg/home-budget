@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/config/supabase'
+import { getAuthOptions, AUTH_REDIRECTS } from '@/lib/auth-config'
 
 
 type AuthMode = 'login' | 'register' | 'reset'
@@ -85,9 +86,13 @@ export default function Auth() {
         setMessage('¡Inicio de sesión exitoso!')
       } else if (mode === 'register') {
         // Proceder directamente con el registro
+        const authOptions = getAuthOptions()
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: AUTH_REDIRECTS.signUp()
+          }
         })
         
         if (error) throw error
@@ -100,7 +105,9 @@ export default function Auth() {
         
         setMessage('¡Registro exitoso! Revisa tu email para confirmar tu cuenta.')
       } else if (mode === 'reset') {
-        const { error } = await supabase.auth.resetPasswordForEmail(email)
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: AUTH_REDIRECTS.resetPassword()
+        })
         if (error) throw error
         setMessage('Se ha enviado un enlace de recuperación a tu email.')
       }

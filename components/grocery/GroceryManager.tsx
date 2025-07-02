@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGroceryStores } from '@/hooks/useGroceryStores';
+import { useProductSuggestions } from '@/hooks/useProductSuggestions';
 import { GroceryMonth, GroceryStore, GroceryItem } from '@/lib/grocery-types';
 import GroceryItemEditor from './GroceryItemEditor';
 
@@ -30,6 +31,13 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     setError
   } = useGroceryStores();
 
+  const {
+    suggestions,
+    loading: suggestionsLoading,
+    loadSuggestions,
+    checkForDuplicates
+  } = useProductSuggestions();
+
   const [showCreateMonth, setShowCreateMonth] = useState(false);
   const [showCreateStore, setShowCreateStore] = useState(false);
   const [editingItem, setEditingItem] = useState<GroceryItem | null>(null);
@@ -50,10 +58,85 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   const [monthToDelete, setMonthToDelete] = useState<{id: string, name: string} | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
+  // Nuevos estados para sugerencias y duplicados
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState<{
+    show: boolean;
+    message: string;
+    existingItem?: GroceryItem;
+  }>({ show: false, message: '' });
+  const [filteredSuggestions, setFilteredSuggestions] = useState(suggestions);
+
+  // Cargar sugerencias cuando cambie el mes o tienda
+  useEffect(() => {
+    if (currentMonth) {
+      loadSuggestions(currentMonth.id, selectedStoreId);
+    }
+  }, [currentMonth, selectedStoreId]);
+
+  // Filtrar sugerencias basadas en el input del usuario
+  useEffect(() => {
+    if (newProduct.name.trim().length > 0) {
+      const filtered = suggestions.filter(suggestion =>
+        suggestion.product_name.toLowerCase().includes(newProduct.name.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setFilteredSuggestions(suggestions.slice(0, 5)); // Mostrar top 5 por defecto
+      setShowSuggestions(false);
+    }
+  }, [newProduct.name, suggestions]);
+
+  // Verificar duplicados cuando el usuario escriba
+  useEffect(() => {
+    const checkDuplicates = async () => {
+      if (newProduct.name.trim().length > 2 && currentMonth) {
+        const duplicateCheck = await checkForDuplicates(
+          newProduct.name,
+          currentMonth.id,
+          selectedStoreId
+        );
+        
+        if (duplicateCheck.isDuplicate) {
+          setDuplicateWarning({
+            show: true,
+            message: `⚠️ Producto similar encontrado: "${duplicateCheck.existingItem?.product_name}"`,
+            existingItem: duplicateCheck.existingItem
+          });
+        } else {
+          setDuplicateWarning({ show: false, message: '' });
+        }
+      } else {
+        setDuplicateWarning({ show: false, message: '' });
+      }
+    };
+
+    const timeoutId = setTimeout(checkDuplicates, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [newProduct.name, currentMonth, selectedStoreId]);
 
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentMonth || !selectedStoreId || !newProduct.name.trim()) return;
+
+    // Verificar duplicados antes de crear el item
+    const duplicateCheck = await checkForDuplicates(
+      newProduct.name,
+      currentMonth.id,
+      selectedStoreId
+    );
+
+    if (duplicateCheck.isDuplicate) {
+      // Mostrar error y no permitir la creación
+      setDuplicateWarning({
+        show: true,
+        message: `❌ No se puede crear: Ya existe "${duplicateCheck.existingItem?.product_name}". Usa un nombre diferente.`,
+        existingItem: duplicateCheck.existingItem
+      });
+      return; // Salir sin crear el item
+    }
 
     setIsAddingProduct(true);
     
@@ -70,19 +153,22 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
         // Limpiar formulario
         setNewProduct({ name: '', quantity: 1, price: 0, notes: '', priority: 2 });
         setSelectedStoreId('');
+        setDuplicateWarning({ show: false, message: '' });
+        setShowSuggestions(false);
         
         // Mostrar mensaje de éxito
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
         
-        // Scroll suave hacia el área de productos para ver el nuevo item
-        const productSection = document.getElementById('products-section');
-        if (productSection) {
-          productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Scroll suave a la sección de productos
+        const productsSection = document.getElementById('products-section');
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: 'smooth' });
         }
       }
-    } catch (error) {
-      console.error('Error al agregar producto:', error);
+    } catch (err) {
+      console.error('Error al agregar producto:', err);
+      setError('Error al agregar el producto');
     } finally {
       setIsAddingProduct(false);
     }
@@ -112,6 +198,17 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       setNewStoreName('');
       setShowCreateStore(false);
     }
+  };
+
+  const handleSuggestionClick = (suggestion: any) => {
+    setNewProduct({
+      name: suggestion.product_name,
+      quantity: suggestion.avg_quantity,
+      price: suggestion.avg_price,
+      notes: '',
+      priority: 2
+    });
+    setShowSuggestions(false);
   };
 
   const handleTogglePurchased = async (itemId: string, currentStatus: boolean) => {
@@ -639,7 +736,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           </div>
         </div>
         
-        {/* Formulario para agregar producto */}
+        {/* Formulario para agregar producto mejorado */}
         <form onSubmit={handleAddProduct} className="border-t pt-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-lg font-semibold text-gray-800">Agregar Producto</h3>
@@ -672,7 +769,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
               </select>
             </div>
             
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre del Producto
               </label>
@@ -684,7 +781,53 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
                 disabled={isAddingProduct}
+                autoComplete="off"
               />
+              
+              {/* Advertencia de Duplicado */}
+              {duplicateWarning.show && (
+                <div className={`absolute z-20 w-full mt-1 p-2 rounded-md text-xs ${
+                  duplicateWarning.message.includes('❌') 
+                    ? 'bg-red-50 border border-red-200 text-red-800' 
+                    : 'bg-yellow-50 border border-yellow-200 text-yellow-800'
+                }`}>
+                  <p className="font-medium">{duplicateWarning.message}</p>
+                  {duplicateWarning.existingItem && (
+                    <p className="mt-1 opacity-75">
+                      Cantidad: {duplicateWarning.existingItem.quantity} | 
+                      Precio: ${duplicateWarning.existingItem.unit_price}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* Panel de Sugerencias */}
+              {showSuggestions && filteredSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  <div className="p-2 bg-gray-50 border-b">
+                    <p className="text-xs text-gray-600">💡 Sugerencias basadas en tus compras anteriores</p>
+                  </div>
+                  {filteredSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="w-full text-left px-3 py-2 hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-900">{suggestion.product_name}</span>
+                        <span className="text-xs text-gray-500">×{suggestion.frequency}</span>
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        Cant: {suggestion.avg_quantity} | Precio: ${suggestion.avg_price}
+                        {suggestion.store_name && (
+                          <span className="ml-2 text-blue-600">• {suggestion.store_name}</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             
             <div>
@@ -768,12 +911,31 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             </div>
           </div>
           
+          {/* Mostrar sugerencias populares cuando el campo esté vacío */}
+          {!showSuggestions && newProduct.name.trim() === '' && suggestions.length > 0 && (
+            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm font-medium text-blue-800 mb-2">🔥 Productos más comprados:</p>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.slice(0, 5).map((suggestion, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs hover:bg-blue-200 transition-colors"
+                  >
+                    {suggestion.product_name} (×{suggestion.frequency})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {/* Mostrar total calculado */}
           {(newProduct.quantity > 0 && newProduct.price > 0) && (
-            <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-blue-700">Total calculado:</span>
-                <span className="font-bold text-blue-800">
+                <span className="text-sm text-green-700">💰 Total calculado:</span>
+                <span className="font-bold text-green-800">
                   ${(newProduct.quantity * newProduct.price).toFixed(2)}
                 </span>
               </div>

@@ -126,23 +126,23 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
     <div className="space-y-8">
       {/* Recomendaciones Inteligentes */}
       {recommendations.length > 0 && (
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <h3 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-gray-100">
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 flex items-center justify-center sm:justify-start">
             <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-3 mr-4">
               🎯
             </span>
             Recomendaciones Personalizadas
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {recommendations.slice(0, 4).map((rec, index) => (
               <div key={index} className={`relative overflow-hidden rounded-2xl p-6 border-2 transition-all duration-300 hover:shadow-lg hover:scale-105 ${
                 rec.priority === 'high' ? 'border-red-200 bg-red-50' :
                 rec.priority === 'medium' ? 'border-yellow-200 bg-yellow-50' :
                 'border-green-200 bg-green-50'
               }`}>
-                <div className="flex items-start space-x-4">
-                  <div className={`text-4xl p-3 rounded-full ${
+                <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left sm:space-x-4">
+                  <div className={`text-3xl sm:text-4xl p-3 rounded-full mb-4 sm:mb-0 ${
                     rec.color === 'blue' ? 'bg-blue-100' :
                     rec.color === 'orange' ? 'bg-orange-100' :
                     rec.color === 'purple' ? 'bg-purple-100' :
@@ -155,7 +155,7 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
                     <h4 className="text-lg font-bold text-gray-800 mb-2">{rec.title}</h4>
                     <p className="text-sm text-gray-600 mb-4">{rec.description}</p>
                     <Link href={rec.link}>
-                      <button className={`px-4 py-2 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-lg ${
+                      <button className={`w-full sm:w-auto px-4 py-2 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-lg ${
                         rec.color === 'blue' ? 'bg-blue-500 hover:bg-blue-600' :
                         rec.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600' :
                         rec.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600' :

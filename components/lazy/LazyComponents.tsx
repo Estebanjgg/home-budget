@@ -21,7 +21,7 @@ export const LazyMetricsOverview = dynamic(
 );
 
 export const LazyFinancialHealthIndicators = dynamic(
-  () => import('@/components/dashboard/FinancialHealthIndicators').then(mod => ({ default: mod.FinancialHealthIndicators })),
+  () => import('@/components/dashboard/FinancialHealthIndicators'),
   {
     loading: () => <LoadingSpinner />,
     ssr: false,
@@ -78,18 +78,18 @@ export const LazyEducationCenter = dynamic(
 
 // Lazy loading para componentes de presupuesto
 export const LazyBudgetManager = dynamic(
-  () => import('@/components/budget/BudgetManager').then(mod => ({ default: mod.BudgetManager || mod.default })),
+  () => import('@/components/budget/BudgetManager').then(mod => ({ default: mod.BudgetManager })),
   {
     loading: () => <LoadingSpinner />,
-    ssr: false,
+    ssr: false
   }
 );
 
 export const LazyGroceryManager = dynamic(
-  () => import('@/components/grocery/GroceryManager').then(mod => ({ default: mod.GroceryManager || mod.default })),
+  () => import('@/components/grocery/GroceryManager'),
   {
     loading: () => <LoadingSpinner />,
-    ssr: false,
+    ssr: false
   }
 );
 

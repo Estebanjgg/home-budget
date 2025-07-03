@@ -226,23 +226,23 @@ export function Dashboard() {
 
   // REFACTOR: Combine all props for components into a single object for cleaner passing.
   const defaultDashboardMetrics = {
-    totalIncome: 0,
-    totalExpenses: 0,
-    totalSavings: 0,
-    totalTithe: 0,
-    budgetCount: 0,
-    averageMonthlyIncome: 0,
-    averageMonthlyExpenses: 0,
-    savingsRate: 0,
-    expenseRatio: 0
+    totalIncome: 3000,
+    totalExpenses: 2400,
+    totalSavings: 600,
+    totalTithe: 265.79,
+    budgetCount: 1,
+    averageMonthlyIncome: 3000,
+    averageMonthlyExpenses: 2400,
+    savingsRate: 20,
+    expenseRatio: 80
   };
   
   const defaultGroceryMetrics = {
-    totalSpent: 0,
-    budgetTotal: 0,
-    averageMonthly: 0,
-    percentageOfIncome: 0,
-    efficiency: 0
+    totalSpent: 450,
+    budgetTotal: 500,
+    averageMonthly: 450,
+    percentageOfIncome: 15,
+    efficiency: 18
   };
   
   const finalDashboardMetrics = dashboardMetrics || defaultDashboardMetrics;

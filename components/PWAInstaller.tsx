@@ -18,8 +18,11 @@ const PWAInstaller = () => {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Detectar iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     setIsIOS(iOS);
@@ -94,8 +97,15 @@ const PWAInstaller = () => {
   const handleDismiss = () => {
     setShowInstallPrompt(false);
     // Recordar que el usuario rechazó la instalación
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    }
   };
+
+  // No renderizar hasta que esté montado
+  if (!mounted) {
+    return null;
+  }
 
   // No mostrar si ya está instalado o en modo standalone
   if (isInstalled || isStandalone) {
@@ -103,7 +113,7 @@ const PWAInstaller = () => {
   }
 
   // Verificar si el usuario ya rechazó la instalación recientemente
-  const dismissedTime = localStorage.getItem('pwa-install-dismissed');
+  const dismissedTime = typeof window !== 'undefined' ? localStorage.getItem('pwa-install-dismissed') : null;
   if (dismissedTime) {
     const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
     if (daysSinceDismissed < 7) { // No mostrar por 7 días

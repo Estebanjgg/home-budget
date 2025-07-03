@@ -1,8 +1,15 @@
-import React from 'react'
+'use client'
+import React, { useState, useEffect } from 'react'
 import { getAssetPath } from '@/lib/utils'
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const [currentYear, setCurrentYear] = useState(2024)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setCurrentYear(new Date().getFullYear())
+  }, [])
 
   return (
     <footer className="bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 text-white">

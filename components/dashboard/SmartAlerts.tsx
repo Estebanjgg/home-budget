@@ -114,10 +114,12 @@ export function SmartAlerts({
   const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set())
   const [newAlertsToShow, setNewAlertsToShow] = useState<Alert[]>([])
   const [swipingAlerts, setSwipingAlerts] = useState<Set<string>>(new Set())
+  const [mounted, setMounted] = useState(false)
   const alertRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
-  // Cargar estado inicial desde localStorage
+  // Cargar estado inicial desde localStorage solo después del montaje
   useEffect(() => {
+    setMounted(true)
     setDismissedAlerts(getDismissedAlerts())
     setShowAlerts(getAlertsVisibility())
   }, [])
@@ -369,6 +371,23 @@ export function SmartAlerts({
   const activeAlerts = alerts.filter(alert => !alert.dismissed)
   const criticalAlerts = activeAlerts.filter(alert => alert.type === 'danger')
   const warningAlerts = activeAlerts.filter(alert => alert.type === 'warning')
+
+  // Evitar hidratación hasta que el componente esté montado
+  if (!mounted) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 rounded-lg bg-gray-100">
+            <AlertTriangle className="w-6 h-6 text-gray-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">🛡️ Alertas Inteligentes</h3>
+            <p className="text-sm text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">

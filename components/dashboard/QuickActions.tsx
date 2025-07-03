@@ -27,7 +27,11 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
         title: 'Aumentar Ahorros',
         description: 'Tu tasa de ahorro está por debajo del 10%. Considera reducir gastos no esenciales.',
         action: 'Crear Plan de Ahorro',
-        link: '/budget',
+        link: '#',
+        onClick: () => {
+          const event = new CustomEvent('changeTab', { detail: 'budgets' });
+          window.dispatchEvent(event);
+        },
         icon: '💰',
         color: 'blue',
         priority: 'high'
@@ -39,7 +43,11 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
         title: 'Optimizar Gastos de Supermercado',
         description: 'Gastas más del 25% de tus ingresos en supermercado. Planifica mejor tus compras.',
         action: 'Planificar Compras',
-        link: '/grocery',
+        link: '#',
+        onClick: () => {
+          const event = new CustomEvent('changeTab', { detail: 'grocery' });
+          window.dispatchEvent(event);
+        },
         icon: '🛒',
         color: 'orange',
         priority: 'high'
@@ -51,7 +59,11 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
         title: 'Mejorar Eficiencia de Compras',
         description: 'Tu eficiencia de compras es baja. Usa listas y compara precios.',
         action: 'Ver Consejos',
-        link: '/grocery',
+        link: '#',
+        onClick: () => {
+          const event = new CustomEvent('changeTab', { detail: 'grocery' });
+          window.dispatchEvent(event);
+        },
         icon: '⚡',
         color: 'purple',
         priority: 'medium'
@@ -63,7 +75,11 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
         title: 'Controlar Gastos',
         description: 'Tus gastos superan el 85% de tus ingresos. Revisa tu presupuesto.',
         action: 'Revisar Presupuesto',
-        link: '/budget',
+        link: '#',
+        onClick: () => {
+          const event = new CustomEvent('changeTab', { detail: 'budgets' });
+          window.dispatchEvent(event);
+        },
         icon: '📊',
         color: 'red',
         priority: 'high'
@@ -96,28 +112,40 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
       title: 'Nuevo Presupuesto',
       description: 'Crea o ajusta tu presupuesto mensual',
       icon: '📋',
-      link: '/budget',
+      onClick: () => {
+        const event = new CustomEvent('changeTab', { detail: 'budgets' });
+        window.dispatchEvent(event);
+      },
       color: 'blue'
     },
     {
       title: 'Lista de Compras',
       description: 'Planifica tu próxima ida al supermercado',
       icon: '📝',
-      link: '/grocery',
+      onClick: () => {
+        const event = new CustomEvent('changeTab', { detail: 'grocery' });
+        window.dispatchEvent(event);
+      },
       color: 'green'
     },
     {
       title: 'Registrar Gasto',
       description: 'Añade un nuevo gasto a tu presupuesto',
       icon: '💸',
-      link: '/budget',
+      onClick: () => {
+        const event = new CustomEvent('changeTab', { detail: 'budgets' });
+        window.dispatchEvent(event);
+      },
       color: 'orange'
     },
     {
       title: 'Ver Reportes',
       description: 'Analiza tus patrones de gasto',
       icon: '📊',
-      link: '/reports',
+      onClick: () => {
+        // Mantener en dashboard ya que los reportes están aquí
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
       color: 'purple'
     }
   ]
@@ -154,17 +182,17 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
                   <div className="flex-1">
                     <h4 className="text-lg font-bold text-gray-800 mb-2">{rec.title}</h4>
                     <p className="text-sm text-gray-600 mb-4">{rec.description}</p>
-                    <Link href={rec.link}>
-                      <button className={`w-full sm:w-auto px-4 py-2 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-lg ${
+                    <button 
+                      onClick={rec.onClick || (() => {})}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-xl text-white font-medium transition-all duration-300 hover:shadow-lg ${
                         rec.color === 'blue' ? 'bg-blue-500 hover:bg-blue-600' :
                         rec.color === 'orange' ? 'bg-orange-500 hover:bg-orange-600' :
                         rec.color === 'purple' ? 'bg-purple-500 hover:bg-purple-600' :
                         rec.color === 'red' ? 'bg-red-500 hover:bg-red-600' :
                         'bg-green-500 hover:bg-green-600'
                       }`}>
-                        {rec.action}
-                      </button>
-                    </Link>
+                      {rec.action}
+                    </button>
                   </div>
                 </div>
                 
@@ -191,24 +219,26 @@ export function QuickActions({ dashboardMetrics, groceryMetrics, formatCurrency 
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, index) => (
-            <Link key={index} href={action.link}>
-              <div className="group cursor-pointer bg-gray-50 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white border border-gray-100">
-                <div className={`text-4xl mb-4 p-3 rounded-full w-fit mx-auto transition-all duration-300 group-hover:scale-110 ${
-                  action.color === 'blue' ? 'bg-blue-100 group-hover:bg-blue-200' :
-                  action.color === 'green' ? 'bg-green-100 group-hover:bg-green-200' :
-                  action.color === 'orange' ? 'bg-orange-100 group-hover:bg-orange-200' :
-                  'bg-purple-100 group-hover:bg-purple-200'
-                }`}>
-                  {action.icon}
-                </div>
-                <h4 className="text-lg font-bold text-gray-800 mb-2 text-center group-hover:text-gray-900">
-                  {action.title}
-                </h4>
-                <p className="text-sm text-gray-600 text-center group-hover:text-gray-700">
-                  {action.description}
-                </p>
+            <div 
+              key={index} 
+              onClick={action.onClick}
+              className="group cursor-pointer bg-gray-50 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-white border border-gray-100"
+            >
+              <div className={`text-4xl mb-4 p-3 rounded-full w-fit mx-auto transition-all duration-300 group-hover:scale-110 ${
+                action.color === 'blue' ? 'bg-blue-100 group-hover:bg-blue-200' :
+                action.color === 'green' ? 'bg-green-100 group-hover:bg-green-200' :
+                action.color === 'orange' ? 'bg-orange-100 group-hover:bg-orange-200' :
+                'bg-purple-100 group-hover:bg-purple-200'
+              }`}>
+                {action.icon}
               </div>
-            </Link>
+              <h4 className="text-lg font-bold text-gray-800 mb-2 text-center group-hover:text-gray-900">
+                {action.title}
+              </h4>
+              <p className="text-sm text-gray-600 text-center group-hover:text-gray-700">
+                {action.description}
+              </p>
+            </div>
           ))}
         </div>
       </div>

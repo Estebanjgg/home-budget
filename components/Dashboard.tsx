@@ -11,6 +11,9 @@ import { MetricsOverview } from './dashboard/MetricsOverview'
 import { FinancialHealthIndicators } from './dashboard/FinancialHealthIndicators'
 import { QuickActions } from './dashboard/QuickActions'
 import { EducationCenter } from './dashboard/EducationCenter'
+import { AdvancedCharts } from './dashboard/AdvancedCharts'
+import { SmartAlerts } from './dashboard/SmartAlerts'
+import { Toaster } from 'react-hot-toast'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -27,6 +30,27 @@ interface EducationalContentItem {
   is_featured?: boolean
 }
 
+// Función para obtener el porcentaje de límite por categoría
+const getCategoryLimitPercentage = (categoryName: string): number => {
+  const category = categoryName.toLowerCase()
+  
+  if (category.includes('vivienda') || category.includes('alquiler') || category.includes('hipoteca')) {
+    return 0.30 // 30% para vivienda
+  } else if (category.includes('alimentación') || category.includes('comida') || category.includes('supermercado')) {
+    return 0.15 // 15% para alimentación
+  } else if (category.includes('transporte') || category.includes('gasolina') || category.includes('combustible')) {
+    return 0.15 // 15% para transporte
+  } else if (category.includes('entretenimiento') || category.includes('ocio')) {
+    return 0.05 // 5% para entretenimiento
+  } else if (category.includes('salud') || category.includes('médico')) {
+    return 0.10 // 10% para salud
+  } else if (category.includes('educación') || category.includes('estudio')) {
+    return 0.10 // 10% para educación
+  } else {
+    return 0.10 // 10% por defecto para otras categorías
+  }
+}
+
 export function Dashboard() {
   const { budgets, loading, error, calculateSummary } = useBudgets()
   const { content: educationalContent, featuredContent, isAdmin, loading: educationLoading } = useEducationalContent()
@@ -35,6 +59,8 @@ export function Dashboard() {
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState<EducationalContent | null>(null)
   const [selectedArticle, setSelectedArticle] = useState<EducationalContent | null>(null)
+  const [budgetLimits, setBudgetLimits] = useState<{ [category: string]: number }>({})
+  const [categoryExpenses, setCategoryExpenses] = useState<{ [category: string]: number }>({})
 
   // Calcular métricas del dashboard
   const calculateDashboardMetrics = async () => {
@@ -58,6 +84,8 @@ export function Dashboard() {
     let budgetCount = budgets.length
     let totalGroceries = 0
     let groceryBudgetTotal = 0
+    const tempBudgetLimits: { [category: string]: number } = {}
+    const tempCategoryExpenses: { [category: string]: number } = {}
 
     await Promise.all(
       budgets.map(async (budget) => {
@@ -85,9 +113,29 @@ export function Dashboard() {
           
           // Presupuesto estimado para supermercado (30% de ingresos como referencia)
           groceryBudgetTotal += (summary.totalIncome || 0) * 0.3
+          
+          // Calcular límites y gastos por categoría para alertas
+          items.forEach((item: BudgetItem & { category: ExpenseCategory | null }) => {
+            if (item.category?.name) {
+              const categoryName = item.category.name
+              const amount = item.estimated_amount || 0
+              
+              // Acumular gastos por categoría
+              tempCategoryExpenses[categoryName] = (tempCategoryExpenses[categoryName] || 0) + amount
+              
+              // Establecer límites basados en porcentajes de ingresos
+              if (!tempBudgetLimits[categoryName]) {
+                const incomePercentage = getCategoryLimitPercentage(categoryName)
+                tempBudgetLimits[categoryName] = (summary.totalIncome || 0) * incomePercentage
+              }
+            }
+          })
         }
       })
     )
+    
+    setBudgetLimits(tempBudgetLimits)
+    setCategoryExpenses(tempCategoryExpenses)
 
     // Métricas por mes (últimos 6 meses)
     const monthlyData = []
@@ -454,9 +502,22 @@ export function Dashboard() {
             formatCurrency={formatCurrency}
           />
 
+          <SmartAlerts
+            monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
+            monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
+            budgetLimits={budgetLimits}
+            categoryExpenses={categoryExpenses}
+            formatCurrency={formatCurrency}
+          />
+
           <QuickActions 
             dashboardMetrics={dashboardMetrics}
             groceryMetrics={groceryMetrics}
+            formatCurrency={formatCurrency}
+          />
+
+          <AdvancedCharts
+            monthlyData={dashboardMetrics.monthlyData || []}
             formatCurrency={formatCurrency}
           />
 
@@ -574,6 +635,35 @@ export function Dashboard() {
           onClose={() => setSelectedArticle(null)}
         />
       )}
+      
+      {/* Toaster para notificaciones */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#fff',
+            color: '#363636',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+            borderRadius: '12px',
+            padding: '16px',
+            fontSize: '14px',
+            fontWeight: '500'
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#fff'
+            }
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#fff'
+            }
+          }
+        }}
+      />
     </div>
   )
 }

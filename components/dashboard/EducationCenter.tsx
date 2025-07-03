@@ -712,12 +712,19 @@ export function EducationCenter({
       
       {/* Call to Action */}
       <div className="mt-6 sm:mt-8 text-center">
-        <Link href="/education">
-          <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
-            <span className="hidden sm:inline">Explorar Todo el Contenido Educativo</span>
-            <span className="sm:hidden">Explorar Contenido</span>
-          </button>
-        </Link>
+        <button 
+          onClick={() => {
+            // Cambiar a la pestaña de educación si existe, o mantener en dashboard
+            const event = new CustomEvent('changeTab', { detail: 'dashboard' });
+            window.dispatchEvent(event);
+            // Hacer scroll hacia arriba para mostrar todo el contenido educativo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+        >
+          <span className="hidden sm:inline">Explorar Todo el Contenido Educativo</span>
+          <span className="sm:hidden">Explorar Contenido</span>
+        </button>
       </div>
     </div>
   )

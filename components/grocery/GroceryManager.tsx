@@ -444,55 +444,57 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <button
               onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-xs sm:text-sm md:text-base"
             >
               ← Volver al Dashboard
             </button>
             
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col xs:flex-row sm:flex-row gap-2">
               <button
                 onClick={() => setShowCreateMonth(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                className="bg-blue-600 text-white px-3 py-2 sm:px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
               >
                 <span>📅</span>
-                <span>Nuevo Mes</span>
+                <span className="hidden xs:inline">Nuevo Mes</span>
+                <span className="xs:hidden">Mes</span>
               </button>
               
               <button
                 onClick={() => setShowCreateStore(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
+                className="bg-green-600 text-white px-3 py-2 sm:px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
               >
                 <span>🏪</span>
-                <span>Nuevo Supermercado</span>
+                <span className="hidden xs:inline">Nuevo Supermercado</span>
+                <span className="xs:hidden">Tienda</span>
               </button>
             </div>
           </div>
           
-          <div className="mt-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mis Gastos Supermercado</h1>
-            <p className="text-gray-600">Selecciona un mes para ver los detalles</p>
+          <div className="mt-3 sm:mt-4">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">Mis Gastos Supermercado</h1>
+            <p className="text-gray-600 text-sm sm:text-base">Selecciona un mes para ver los detalles</p>
           </div>
         </div>
 
         {/* Cards de Meses */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {months.map((month) => (
             <div
               key={month.id}
               onClick={() => handleEnterMonth(month)}
               className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 border border-gray-200 hover:border-blue-300"
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">{month.display_name}</h3>
-                  <span className="text-2xl">📅</span>
+              <div className="p-4 sm:p-6">
+                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-800">{month.display_name}</h3>
+                  <span className="text-xl sm:text-2xl">📅</span>
                 </div>
                 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-2 text-xs sm:text-sm text-gray-600">
                   <div className="flex justify-between">
                     <span>Creado:</span>
                     <span>{new Date(month.created_at).toLocaleDateString()}</span>
@@ -503,8 +505,8 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                   </div>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-center text-blue-600 font-medium">
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-center text-blue-600 font-medium text-sm sm:text-base">
                     <span>Ver detalles →</span>
                   </div>
                 </div>
@@ -514,13 +516,13 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           
           {months.length === 0 && (
             <div className="col-span-full">
-              <div className="bg-gray-50 rounded-xl p-8 text-center">
-                <span className="text-4xl mb-4 block">📅</span>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No hay meses creados</h3>
-                <p className="text-gray-500 mb-4">Crea tu primer mes para comenzar a gestionar tus gastos de supermercado</p>
+              <div className="bg-gray-50 rounded-xl p-6 sm:p-8 text-center">
+                <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">📅</span>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">No hay meses creados</h3>
+                <p className="text-gray-500 mb-4 text-sm sm:text-base">Crea tu primer mes para comenzar a gestionar tus gastos de supermercado</p>
                 <button
                   onClick={() => setShowCreateMonth(true)}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
                 >
                   Crear Primer Mes
                 </button>
@@ -625,68 +627,72 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
   return (
     <div className="space-y-6">
       {/* Header con botón de regreso a cards */}
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={handleBackToCards}
-              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-xs sm:text-sm md:text-base"
             >
               ← Volver a Meses
             </button>
             <button
               onClick={onBack}
-              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors text-xs sm:text-sm md:text-base"
             >
               🏠 Dashboard
             </button>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col xs:flex-row sm:flex-row gap-2">
             <button
               onClick={() => setShowCreateMonth(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+              className="bg-blue-600 text-white px-2 py-2 sm:px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
             >
               <span>📅</span>
-              <span>Nuevo Mes</span>
+              <span className="hidden sm:inline">Nuevo Mes</span>
+              <span className="sm:hidden">Mes</span>
             </button>
             
             <button
               onClick={() => setShowCreateStore(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
+              className="bg-green-600 text-white px-2 py-2 sm:px-4 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
             >
               <span>🏪</span>
-              <span>Nuevo Supermercado</span>
+              <span className="hidden sm:inline">Nuevo Supermercado</span>
+              <span className="sm:hidden">Tienda</span>
             </button>
             
             <button
               onClick={handleGeneratePDF}
               disabled={isGeneratingPDF}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-purple-400 disabled:cursor-not-allowed"
+              className="bg-purple-600 text-white px-2 py-2 sm:px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-1 sm:gap-2 disabled:bg-purple-400 disabled:cursor-not-allowed text-xs sm:text-sm"
             >
               {isGeneratingPDF ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  <span>Generando...</span>
+                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent"></div>
+                  <span className="hidden sm:inline">Generando...</span>
+                  <span className="sm:hidden">PDF</span>
                 </>
               ) : (
                 <>
                   <span>📄</span>
-                  <span>Generar PDF</span>
+                  <span className="hidden sm:inline">Generar PDF</span>
+                  <span className="sm:hidden">PDF</span>
                 </>
               )}
             </button>
             
             {/* Mensaje de estado del PDF */}
             {pdfMessage && (
-              <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+              <div className={`fixed top-4 right-4 z-50 p-3 sm:p-4 rounded-lg shadow-lg ${
                 pdfMessage.type === 'success' 
                   ? 'bg-green-50 border border-green-200 text-green-800'
                   : 'bg-red-50 border border-red-200 text-red-800'
               } animate-pulse`}>
                 <div className="flex items-center gap-2">
                   <span>{pdfMessage.type === 'success' ? '✅' : '❌'}</span>
-                  <span className="font-medium">{pdfMessage.text}</span>
+                  <span className="font-medium text-xs sm:text-sm">{pdfMessage.text}</span>
                 </div>
               </div>
             )}
@@ -694,62 +700,63 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             {currentMonth && (
               <button
                 onClick={() => handleDeleteMonth(currentMonth.id, currentMonth.display_name)}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+                className="bg-red-600 text-white px-2 py-2 sm:px-4 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
               >
                 <span>🗑️</span>
-                <span>Eliminar Mes</span>
+                <span className="hidden sm:inline">Eliminar Mes</span>
+                <span className="sm:hidden">Eliminar</span>
               </button>
             )}
           </div>
         </div>
         
-        <div className="mt-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Mis Gastos Supermercado</h1>
+        <div className="mt-3 sm:mt-4">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">Mis Gastos Supermercado</h1>
           {currentMonth && (
-            <p className="text-gray-600">Mes actual: {currentMonth.display_name}</p>
+            <p className="text-gray-600 text-sm sm:text-base">Mes actual: {currentMonth.display_name}</p>
           )}
         </div>
       </div>
       
       {/* Resumen del mes */}
       {monthSummary && (
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Resumen del Mes</h2>
+        <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Resumen del Mes</h2>
           
           {/* Resumen general */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                 {monthSummary.stores.reduce((total, store) => total + store.items.length, 0)}
               </div>
-              <div className="text-sm text-gray-600">Total Items</div>
+              <div className="text-xs sm:text-sm text-gray-600">Total Items</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
                 {monthSummary.stores.reduce((total, store) => 
                   total + store.items.filter(item => item.purchased).length, 0
                 )}
               </div>
-              <div className="text-sm text-gray-600">Comprados</div>
+              <div className="text-xs sm:text-sm text-gray-600">Comprados</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600">
                 {monthSummary.stores.reduce((total, store) => 
                   total + store.items.filter(item => !item.purchased).length, 0
                 )}
               </div>
-              <div className="text-sm text-gray-600">Pendientes</div>
+              <div className="text-xs sm:text-sm text-gray-600">Pendientes</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">${monthSummary.grandTotal.toFixed(2)}</div>
-              <div className="text-sm text-gray-600">Total General</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">${monthSummary.grandTotal.toFixed(2)}</div>
+              <div className="text-xs sm:text-sm text-gray-600">Total General</div>
             </div>
           </div>
 
           {/* Resumen por supermercado */}
-          <div className="border-t pt-4">
-            <h3 className="text-md font-semibold text-gray-800 mb-3">Balance por Supermercado</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="border-t pt-3 sm:pt-4">
+            <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-3">Balance por Supermercado</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {monthSummary.stores.map((store) => {
                 const storeItemCount = store.items.length;
                 const storePurchasedCount = store.items.filter(item => item.purchased).length;
@@ -757,31 +764,31 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 const storeTotal = store.total || store.items.reduce((sum, item) => sum + item.total_amount, 0);
                 
                 return (
-                  <div key={store.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-800 truncate">{store.name}</h4>
-                      <span className="text-lg">🏪</span>
+                  <div key={store.id} className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+                    <div className="flex items-center justify-between mb-2 sm:mb-3">
+                      <h4 className="font-semibold text-gray-800 truncate text-sm sm:text-base">{store.name}</h4>
+                      <span className="text-base sm:text-lg">🏪</span>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-1 sm:space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Total Items:</span>
-                        <span className="font-medium text-blue-600">{storeItemCount}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">Total Items:</span>
+                        <span className="font-medium text-blue-600 text-xs sm:text-sm">{storeItemCount}</span>
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Comprados:</span>
-                        <span className="font-medium text-green-600">{storePurchasedCount}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">Comprados:</span>
+                        <span className="font-medium text-green-600 text-xs sm:text-sm">{storePurchasedCount}</span>
                       </div>
                       
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Pendientes:</span>
-                        <span className="font-medium text-orange-600">{storePendingCount}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">Pendientes:</span>
+                        <span className="font-medium text-orange-600 text-xs sm:text-sm">{storePendingCount}</span>
                       </div>
                       
                       <div className="flex justify-between items-center pt-2 border-t border-gray-300">
-                        <span className="text-sm font-semibold text-gray-700">Total Gastado:</span>
-                        <span className="font-bold text-purple-600">${storeTotal.toFixed(2)}</span>
+                        <span className="text-xs sm:text-sm font-semibold text-gray-700">Total Gastado:</span>
+                        <span className="font-bold text-purple-600 text-xs sm:text-sm">${storeTotal.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -826,9 +833,9 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       )}
       
       {/* Filtros y controles */}
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -836,16 +843,16 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 onChange={(e) => setShowOnlyPending(e.target.checked)}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700">Solo pendientes</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Solo pendientes</span>
             </label>
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-700">Ordenar por:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'name' | 'priority' | 'price')}
-              className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="border border-gray-300 rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="priority">Prioridad</option>
               <option value="name">Nombre</option>
@@ -855,26 +862,26 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
         </div>
         
         {/* Formulario para agregar producto mejorado */}
-        <form onSubmit={handleAddProduct} className="border-t pt-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-gray-800">Agregar Producto</h3>
+        <form onSubmit={handleAddProduct} className="border-t pt-3 sm:pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">Agregar Producto</h3>
             {showSuccessMessage && (
-              <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1 rounded-lg border border-green-200 animate-pulse">
+              <div className="flex items-center gap-2 text-green-600 bg-green-50 px-2 sm:px-3 py-1 rounded-lg border border-green-200 animate-pulse">
                 <span>✅</span>
-                <span className="text-sm font-medium">¡Producto agregado!</span>
+                <span className="text-xs sm:text-sm font-medium">¡Producto agregado!</span>
               </div>
             )}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Supermercado
               </label>
               <select
                 value={selectedStoreId}
                 onChange={(e) => setSelectedStoreId(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
                 disabled={isAddingProduct}
               >
@@ -888,7 +895,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             </div>
             
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Nombre del Producto
               </label>
               <input
@@ -896,7 +903,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 placeholder="Ej: Leche, Pan, Arroz..."
                 value={newProduct.name}
                 onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
                 disabled={isAddingProduct}
                 autoComplete="off"
@@ -949,7 +956,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Cantidad
               </label>
               <input
@@ -970,14 +977,14 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 onFocus={(e) => {
                   e.target.select();
                 }}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
                 disabled={isAddingProduct}
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Precio Unitario ($)
               </label>
               <input
@@ -991,21 +998,21 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                       e.target.select();
                     }
                   }}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 required
                 disabled={isAddingProduct}
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Notas (opcional)
               </label>
               <textarea
                 value={newProduct.notes}
                 onChange={(e) => setNewProduct({ ...newProduct, notes: e.target.value })}
                 rows={2}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="Marca específica, tamaño, etc..."
                 disabled={isAddingProduct}
               />
@@ -1015,11 +1022,11 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
               <button
                 type="submit"
                 disabled={isAddingProduct}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:bg-blue-400 disabled:cursor-not-allowed text-xs sm:text-sm"
               >
                 {isAddingProduct ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-3 sm:h-4 w-3 sm:w-4 border-2 border-white border-t-transparent"></div>
                     <span>Agregando...</span>
                   </>
                 ) : (
@@ -1034,15 +1041,15 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           
           {/* Mostrar sugerencias populares cuando el campo esté vacío */}
           {!showSuggestions && newProduct.name.trim() === '' && suggestions.length > 0 && (
-            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm font-medium text-blue-800 mb-2">🔥 Productos más comprados:</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-2 sm:mt-3 bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3">
+              <p className="text-xs sm:text-sm font-medium text-blue-800 mb-2">🔥 Productos más comprados:</p>
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {suggestions.slice(0, 5).map((suggestion, index) => (
                   <button
                     key={index}
                     type="button"
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs hover:bg-blue-200 transition-colors"
+                    className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs hover:bg-blue-200 transition-colors"
                   >
                     {suggestion.product_name} (×{suggestion.frequency})
                   </button>
@@ -1053,10 +1060,10 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           
           {/* Mostrar total calculado */}
           {(newProduct.quantity > 0 && parseGroceryPrice(newProduct.price.toString()) > 0) && (
-            <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+            <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-green-700">💰 Total calculado:</span>
-                <span className="font-bold text-green-800">
+                <span className="text-xs sm:text-sm text-green-700">💰 Total calculado:</span>
+                <span className="font-bold text-green-800 text-sm sm:text-base">
                   ${(newProduct.quantity * parseGroceryPrice(newProduct.price.toString())).toFixed(2)}
                 </span>
               </div>
@@ -1066,7 +1073,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       </div>
       
       {/* Lista de supermercados y productos */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {monthSummary && monthSummary.stores.map((store) => {
           const storeItems = store.items ? filteredAndSortedItems(store.items) : [];
           
@@ -1074,11 +1081,11 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
           
           return (
             <div key={store.id} className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 sm:p-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{store.name}</h3>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm opacity-90">
+                  <h3 className="text-base sm:text-lg font-semibold">{store.name}</h3>
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <span className="text-xs sm:text-sm opacity-90">
                       {storeItems.length} productos
                     </span>
                     <button
@@ -1092,26 +1099,26 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                 </div>
               </div>
               
-              <div className="p-4">
+              <div className="p-3 sm:p-4">
                 {storeItems.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">
+                  <p className="text-gray-500 text-center py-3 sm:py-4 text-sm">
                     {showOnlyPending ? 'No hay productos pendientes' : 'No hay productos en este supermercado'}
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {storeItems.map((item) => (
                       <div
                         key={item.id}
-                        className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                        className={`flex items-center justify-between p-2 sm:p-3 rounded-lg border transition-all ${
                           item.purchased
                             ? 'bg-green-50 border-green-200'
                             : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                         }`}
                       >
-                        <div className="flex items-center gap-3 flex-1">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1">
                           <button
                             onClick={() => handleTogglePurchased(item.id, item.purchased)}
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                               item.purchased
                                 ? 'bg-green-500 border-green-500 text-white'
                                 : 'border-gray-300 hover:border-green-400'
@@ -1121,13 +1128,13 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                           </button>
                           
                           <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-medium ${
+                            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                              <span className={`font-medium text-sm sm:text-base ${
                                 item.purchased ? 'line-through text-gray-500' : 'text-gray-800'
                               }`}>
                                 {item.product_name}
                               </span>
-                              <span className={`text-xs px-2 py-1 rounded-full ${
+                              <span className={`text-xs px-1 sm:px-2 py-1 rounded-full ${
                                 item.priority === 3 ? 'bg-red-100 text-red-700' :
                                 item.priority === 2 ? 'bg-yellow-100 text-yellow-700' :
                                 'bg-green-100 text-green-700'
@@ -1135,7 +1142,7 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                                 {item.priority === 3 ? 'Alta' : item.priority === 2 ? 'Media' : 'Baja'}
                               </span>
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-xs sm:text-sm text-gray-600">
                               Cantidad: {item.quantity} | Precio: ${item.unit_price.toFixed(2)} | Total: ${item.total_amount.toFixed(2)}
                             </div>
                             {item.notes && (
@@ -1146,17 +1153,17 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           <button
                             onClick={() => handleEditItem(item)}
-                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                            className="text-blue-600 hover:text-blue-800 transition-colors p-1"
                             title="Editar producto"
                           >
                             ✏️
                           </button>
                           <button
                             onClick={() => handleDeleteItem(item.id, item.product_name)}
-                            className="text-red-600 hover:text-red-800 transition-colors"
+                            className="text-red-600 hover:text-red-800 transition-colors p-1"
                             title="Eliminar producto"
                           >
                             🗑️
@@ -1172,13 +1179,13 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
         })}
         
         {stores.length === 0 && (
-          <div className="bg-gray-50 rounded-xl p-8 text-center">
-            <span className="text-4xl mb-4 block">🏪</span>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">No hay supermercados</h3>
-            <p className="text-gray-500 mb-4">Crea tu primer supermercado para comenzar a agregar productos</p>
+          <div className="bg-gray-50 rounded-xl p-6 sm:p-8 text-center">
+            <span className="text-3xl sm:text-4xl mb-3 sm:mb-4 block">🏪</span>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">No hay supermercados</h3>
+            <p className="text-sm sm:text-base text-gray-500 mb-3 sm:mb-4">Crea tu primer supermercado para comenzar a agregar productos</p>
             <button
               onClick={() => setShowCreateStore(true)}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="bg-green-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base"
             >
               Crear Primer Supermercado
             </button>
@@ -1189,33 +1196,33 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       {/* Modales existentes */}
       {showCreateMonth && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-2xl border-2 border-blue-200 pointer-events-auto">
-            <h3 className="text-lg font-semibold mb-4">Crear Nuevo Mes</h3>
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-3 sm:mx-4 shadow-2xl border-2 border-blue-200 pointer-events-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Crear Nuevo Mes</h3>
             <form onSubmit={handleCreateMonth}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                   Nombre del mes
                 </label>
                 <input
                   type="text"
                   value={newMonthName}
                   onChange={(e) => setNewMonthName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="Ej: Enero 2024"
                   required
                 />
               </div>
-              <div className="flex gap-3 justify-end">
+              <div className="flex gap-2 sm:gap-3 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowCreateMonth(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-3 sm:px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                 >
                   Crear Mes
                 </button>
@@ -1227,33 +1234,33 @@ export default function GroceryManager({ onBack }: GroceryManagerProps) {
       
       {showCreateStore && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-2xl border-2 border-green-200 pointer-events-auto">
-            <h3 className="text-lg font-semibold mb-4">Crear Nuevo Supermercado</h3>
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-3 sm:mx-4 shadow-2xl border-2 border-green-200 pointer-events-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Crear Nuevo Supermercado</h3>
             <form onSubmit={handleCreateStore}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                   Nombre del supermercado
                 </label>
                 <input
                   type="text"
                   value={newStoreName}
                   onChange={(e) => setNewStoreName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                   placeholder="Ej: Walmart, Soriana, etc."
                   required
                 />
               </div>
-              <div className="flex gap-3 justify-end">
+              <div className="flex gap-2 sm:gap-3 justify-end">
                 <button
                   type="button"
                   onClick={() => setShowCreateStore(false)}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-3 sm:px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
                 >
                   Crear Supermercado
                 </button>

@@ -266,20 +266,20 @@ export function Dashboard() {
         </div>
 
         {/* Sección de Educación Financiera para Usuarios Nuevos */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center">
-            <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-3 mr-4">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+          <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 flex items-center justify-center">
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
               📚
             </span>
-            Aprende Mientras Empiezas
+            <span className="text-center leading-tight">Aprende Mientras Empiezas</span>
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {educationalContent.slice(0, 4).map((content) => (
-              <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
-                <div className="mb-4">
+              <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
+                <div className="mb-3 sm:mb-4">
                   {content.image_url ? (
-                    <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
+                    <div className="relative w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl overflow-hidden">
                       <img 
                         src={content.image_url} 
                         alt={content.title}
@@ -293,16 +293,16 @@ export function Dashboard() {
                         }}
                       />
                       <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
-                        <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                        <span className="text-2xl sm:text-4xl text-white">{content.image_emoji || '📄'}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                      <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
+                    <div className="w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                      <span className="text-2xl sm:text-4xl text-white">{content.image_emoji || '📄'}</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
                       content.type === 'video' 
                         ? 'bg-red-100 text-red-700' 
                         : 'bg-blue-100 text-blue-700'
@@ -313,17 +313,17 @@ export function Dashboard() {
                 </div>
                 
                 <div className="flex-grow">
-                  <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
+                  <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3 line-clamp-2 leading-tight">
                     {content.title}
                   </h4>
                   
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-4">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-4 leading-relaxed">
                     {content.summary || 'Contenido educativo disponible para mejorar tus conocimientos financieros.'}
                   </p>
                 </div>
                 
                 <div className="mt-auto">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
                       content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
                       content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
@@ -337,7 +337,7 @@ export function Dashboard() {
                     </span>
                   </div>
                   
-                  <button onClick={() => handleContentClick(content)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
+                  <button onClick={() => handleContentClick(content)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base">
                     {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
                   </button>
                 </div>
@@ -350,36 +350,36 @@ export function Dashboard() {
         </div>
 
         {/* Consejos Rápidos para Empezar */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-          <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center justify-center">
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-3 mr-4">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+          <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 flex items-center justify-center">
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
               💡
             </span>
-            Consejos para Empezar
+            <span className="text-center leading-tight">Consejos para Empezar</span>
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-200">
               <div className="text-center">
-                <div className="text-4xl mb-4">📊</div>
-                <h4 className="text-xl font-bold text-gray-800 mb-3">1. Registra tus Ingresos</h4>
-                <p className="text-gray-600">Anota todos tus ingresos mensuales: salario, trabajos extras, inversiones, etc.</p>
+                <div className="text-2xl sm:text-3xl lg:text-4xl mb-3 sm:mb-4">📊</div>
+                <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 leading-tight">1. Registra tus Ingresos</h4>
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Anota todos tus ingresos mensuales: salario, trabajos extras, inversiones, etc.</p>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200">
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-green-200">
               <div className="text-center">
-                <div className="text-4xl mb-4">📝</div>
-                <h4 className="text-xl font-bold text-gray-800 mb-3">2. Lista tus Gastos</h4>
-                <p className="text-gray-600">Categoriza tus gastos: vivienda, alimentación, transporte, entretenimiento, etc.</p>
+                <div className="text-2xl sm:text-3xl lg:text-4xl mb-3 sm:mb-4">📝</div>
+                <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 leading-tight">2. Lista tus Gastos</h4>
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Categoriza tus gastos: vivienda, alimentación, transporte, entretenimiento, etc.</p>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-200 sm:col-span-2 lg:col-span-1">
               <div className="text-center">
-                <div className="text-4xl mb-4">🎯</div>
-                <h4 className="text-xl font-bold text-gray-800 mb-3">3. Define tus Metas</h4>
-                <p className="text-gray-600">Establece objetivos de ahorro y planifica cómo alcanzarlos mes a mes.</p>
+                <div className="text-2xl sm:text-3xl lg:text-4xl mb-3 sm:mb-4">🎯</div>
+                <h4 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 leading-tight">3. Define tus Metas</h4>
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed">Establece objetivos de ahorro y planifica cómo alcanzarlos mes a mes.</p>
               </div>
             </div>
           </div>
@@ -479,78 +479,78 @@ export function Dashboard() {
             handleContentClick={handleContentClick}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-              <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-2 mr-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
                   📈
                 </span>
-                Ratio de Gastos
+                <span className="leading-tight">Ratio de Gastos</span>
               </h4>
               <div className="relative">
-                <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
                   <div 
-                    className="bg-gradient-to-r from-yellow-400 to-red-500 h-4 rounded-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-yellow-400 to-red-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
                     style={{ width: `${Math.min(dashboardMetrics.expenseRatio, 100)}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600">
                   <span>0%</span>
                   <span className="font-bold">{dashboardMetrics.expenseRatio.toFixed(1)}%</span>
                   <span>100%</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
                 {dashboardMetrics.expenseRatio < 70 ? '✅ Excelente control' : 
                   dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-              <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-2 mr-3">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
                   🏦
                 </span>
-                Tasa de Ahorro
+                <span className="leading-tight">Tasa de Ahorro</span>
               </h4>
               <div className="relative">
-                <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
                   <div 
-                    className="bg-gradient-to-r from-blue-400 to-green-500 h-4 rounded-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-blue-400 to-green-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
                     style={{ width: `${Math.min(dashboardMetrics.savingsRate, 100)}%` }}
                   ></div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-600">
+                <div className="flex justify-between text-xs sm:text-sm text-gray-600">
                   <span>0%</span>
                   <span className="font-bold">{dashboardMetrics.savingsRate.toFixed(1)}%</span>
                   <span>30%</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
                 {dashboardMetrics.savingsRate >= 20 ? '🌟 Excelente' : 
                   dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-              <h4 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-2 mr-3">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 sm:col-span-2 lg:col-span-1">
+              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
                   ⚡
                 </span>
-                Resumen Rápido
+                <span className="leading-tight">Resumen Rápido</span>
               </h4>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Presupuestos:</span>
-                  <span className="font-bold text-gray-800 text-lg">{dashboardMetrics.budgetCount}</span>
+                  <span className="text-gray-600 text-sm sm:text-base">Presupuestos:</span>
+                  <span className="font-bold text-gray-800 text-base sm:text-lg">{dashboardMetrics.budgetCount}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Diezmo total:</span>
-                  <span className="font-bold text-purple-600 text-lg">{formatCurrency(dashboardMetrics.totalTithe)}</span>
+                  <span className="text-gray-600 text-sm sm:text-base">Diezmo total:</span>
+                  <span className="font-bold text-purple-600 text-base sm:text-lg">{formatCurrency(dashboardMetrics.totalTithe)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Promedio mensual:</span>
-                  <span className="font-bold text-blue-600 text-lg">{formatCurrency((dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) / Math.max(dashboardMetrics.budgetCount, 1))}</span>
+                  <span className="text-gray-600 text-sm sm:text-base">Promedio mensual:</span>
+                  <span className="font-bold text-blue-600 text-base sm:text-lg">{formatCurrency((dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) / Math.max(dashboardMetrics.budgetCount, 1))}</span>
                 </div>
               </div>
             </div>

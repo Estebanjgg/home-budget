@@ -282,12 +282,12 @@ export function EducationCenter({
   }
   
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-      <h3 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-        <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-3 mr-4">
+    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+      <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+        <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-2 sm:p-3 mr-3 sm:mr-4">
           🎓
         </span>
-        Centro de Educación Financiera
+        <span className="text-base sm:text-xl lg:text-3xl">Centro de Educación Financiera</span>
       </h3>
       
       {/* Videos Educativos Destacados */}
@@ -299,14 +299,14 @@ export function EducationCenter({
 
       {/* Controles de Vista y Paginación */}
       {(activeTab === 'articles' || activeTab === 'videos') && (
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-gray-50 rounded-xl">
+        <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl">
           {/* Selector de elementos por página */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Mostrar:</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-700">Mostrar:</span>
             <select 
               value={itemsPerPage} 
               onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -315,36 +315,36 @@ export function EducationCenter({
               <option value={80}>80</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-sm text-gray-600">elementos</span>
+            <span className="text-xs sm:text-sm text-gray-600">elementos</span>
           </div>
           
           {/* Selector de vista */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Vista:</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-700">Vista:</span>
             <div className="flex bg-white rounded-lg border border-gray-300 overflow-hidden">
               <button
                 onClick={() => setViewMode('mosaic')}
-                className={`px-3 py-1 text-sm transition-colors ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm transition-colors ${
                   viewMode === 'mosaic' ? 'bg-purple-500 text-white' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                🔲 Mosaico
+                🔲 <span className="hidden sm:inline">Mosaico</span>
               </button>
               <button
                 onClick={() => setViewMode('normal')}
-                className={`px-3 py-1 text-sm transition-colors border-l border-gray-300 ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm transition-colors border-l border-gray-300 ${
                   viewMode === 'normal' ? 'bg-purple-500 text-white' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                📋 Normal
+                📋 <span className="hidden sm:inline">Normal</span>
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1 text-sm transition-colors border-l border-gray-300 ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm transition-colors border-l border-gray-300 ${
                   viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                📝 Lista
+                📝 <span className="hidden sm:inline">Lista</span>
               </button>
             </div>
           </div>
@@ -352,61 +352,61 @@ export function EducationCenter({
       )}
       
       {/* Estadísticas de Aprendizaje */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-blue-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-blue-600 font-medium">Nivel Financiero</p>
-              <p className="text-2xl font-bold text-blue-800">
+              <p className="text-xs sm:text-sm text-blue-600 font-medium">Nivel Financiero</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-800">
                 {dashboardMetrics.savingsRate >= 20 ? 'Avanzado' :
                  dashboardMetrics.savingsRate >= 10 ? 'Intermedio' : 'Principiante'}
               </p>
             </div>
-            <span className="text-3xl">🏆</span>
+            <span className="text-2xl sm:text-3xl">🏆</span>
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-green-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-green-600 font-medium">Contenido Disponible</p>
-              <p className="text-2xl font-bold text-green-800">
+              <p className="text-xs sm:text-sm text-green-600 font-medium">Contenido Disponible</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-800">
                 {content.articles.length + content.videos.length} recursos
               </p>
             </div>
-            <span className="text-3xl">📖</span>
+            <span className="text-2xl sm:text-3xl">📖</span>
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-100">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-purple-100 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-purple-600 font-medium">Recomendaciones</p>
-              <p className="text-2xl font-bold text-purple-800">
+              <p className="text-xs sm:text-sm text-purple-600 font-medium">Recomendaciones</p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-800">
                 {content.articles.filter(a => a.priority === 'high').length + 
                  content.videos.filter(v => v.priority === 'high').length} prioritarias
               </p>
             </div>
-            <span className="text-3xl">⭐</span>
+            <span className="text-2xl sm:text-3xl">⭐</span>
           </div>
         </div>
       </div>
       
       {/* Tabs de Navegación */}
-      <div className="flex space-x-1 mb-8 bg-gray-100 rounded-2xl p-1">
+      <div className="flex space-x-1 mb-6 sm:mb-8 bg-gray-100 rounded-xl sm:rounded-2xl p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as 'articles' | 'videos' | 'tips')}
-            className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-medium transition-all duration-300 ${
+            className={`flex-1 flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl font-medium transition-all duration-300 ${
               activeTab === tab.id
                 ? 'bg-white text-gray-800 shadow-lg'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            <span className="text-xl">{tab.icon}</span>
-            <span>{tab.label}</span>
-            <span className={`text-xs px-2 py-1 rounded-full ${
+            <span className="text-lg sm:text-xl">{tab.icon}</span>
+            <span className="text-xs sm:text-base">{tab.label}</span>
+            <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
               activeTab === tab.id ? 'bg-gray-200' : 'bg-gray-300'
             }`}>
               {tab.count}
@@ -421,12 +421,12 @@ export function EducationCenter({
           {renderPagination()}
           <div>
           {viewMode === 'mosaic' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {getCurrentArticles().map((article) => (
-                <div key={article.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(article)}>
+                <div key={article.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(article)}>
                   <div className="mb-3">
                     {article.image_url ? (
-                      <div className="relative w-full h-24 mb-2 rounded-lg overflow-hidden">
+                      <div className="relative w-full h-20 sm:h-24 mb-2 rounded-lg overflow-hidden">
                         <img 
                           src={article.image_url} 
                           alt={article.title}
@@ -440,19 +440,19 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
-                          <span className="text-2xl text-white">{article.image_emoji || '📄'}</span>
+                          <span className="text-xl sm:text-2xl text-white">{article.image_emoji || '📄'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-24 mb-2 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        <span className="text-2xl text-white">{article.image_emoji || '📄'}</span>
+                      <div className="w-full h-20 sm:h-24 mb-2 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-xl sm:text-2xl text-white">{article.image_emoji || '📄'}</span>
                       </div>
                     )}
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
                       📄 Artículo
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{article.title}</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-800 mb-2 line-clamp-2">{article.title}</h4>
                   <p className="text-xs text-gray-600 line-clamp-3">{article.summary}</p>
                 </div>
               ))}
@@ -460,12 +460,12 @@ export function EducationCenter({
           )}
           
           {viewMode === 'normal' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {getCurrentArticles().map((article) => (
-                <div key={article.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(article)}>
-                  <div className="mb-4">
+                <div key={article.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(article)}>
+                  <div className="mb-3 sm:mb-4">
                     {article.image_url ? (
-                      <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
+                      <div className="relative w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl overflow-hidden">
                         <img 
                           src={article.image_url} 
                           alt={article.title}
@@ -479,22 +479,22 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
-                          <span className="text-4xl text-white">{article.image_emoji || '📄'}</span>
+                          <span className="text-2xl sm:text-4xl text-white">{article.image_emoji || '📄'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        <span className="text-4xl text-white">{article.image_emoji || '📄'}</span>
+                      <div className="w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-2xl sm:text-4xl text-white">{article.image_emoji || '📄'}</span>
                       </div>
                     )}
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                    <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
                       📄 Artículo
                     </span>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-800 mb-3">{article.title}</h4>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-4">{article.summary}</p>
+                  <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3">{article.title}</h4>
+                  <p className="text-gray-600 text-sm mb-3 sm:mb-4 line-clamp-4">{article.summary}</p>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
                       {article.category}
                     </span>
                     <span className="text-xs text-gray-500">{article.duration || 'Lectura rápida'}</span>
@@ -505,12 +505,12 @@ export function EducationCenter({
           )}
           
           {viewMode === 'list' && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {getCurrentArticles().map((article) => (
-                <div key={article.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => handleContentClick(article)}>
+                <div key={article.id} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => handleContentClick(article)}>
                   <div className="flex-shrink-0">
                     {article.image_url ? (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden">
                         <img 
                             src={article.image_url} 
                             alt={article.title}
@@ -524,25 +524,25 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
-                          <span className="text-xl text-white">{article.image_emoji || '📄'}</span>
+                          <span className="text-lg sm:text-xl text-white">{article.image_emoji || '📄'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        <span className="text-xl text-white">{article.image_emoji || '📄'}</span>
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-lg sm:text-xl text-white">{article.image_emoji || '📄'}</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h4 className="text-lg font-bold text-gray-800">{article.title}</h4>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                      <h4 className="text-sm sm:text-lg font-bold text-gray-800 truncate">{article.title}</h4>
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 flex-shrink-0">
                         📄 Artículo
                       </span>
                     </div>
-                    <p className="text-gray-600 text-sm line-clamp-2">{article.summary}</p>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <span className="px-2 py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
+                    <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">{article.summary}</p>
+                    <div className="flex items-center space-x-2 sm:space-x-4 mt-2">
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
                         {article.category}
                       </span>
                       <span className="text-xs text-gray-500">{article.duration || 'Lectura rápida'}</span>
@@ -563,12 +563,12 @@ export function EducationCenter({
           {renderPagination()}
           <div>
           {viewMode === 'mosaic' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {getCurrentVideos().map((video) => (
-                <div key={video.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(video)}>
+                <div key={video.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(video)}>
                   <div className="mb-3">
                     {video.image_url ? (
-                      <div className="relative w-full h-24 mb-2 rounded-lg overflow-hidden">
+                      <div className="relative w-full h-20 sm:h-24 mb-2 rounded-lg overflow-hidden">
                         <img 
                           src={video.image_url} 
                           alt={video.title}
@@ -582,19 +582,19 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-red-400 to-pink-500 items-center justify-center">
-                          <span className="text-2xl text-white">{video.image_emoji || '🎥'}</span>
+                          <span className="text-xl sm:text-2xl text-white">{video.image_emoji || '🎥'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-24 mb-2 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
-                        <span className="text-2xl text-white">{video.image_emoji || '🎥'}</span>
+                      <div className="w-full h-20 sm:h-24 mb-2 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
+                        <span className="text-xl sm:text-2xl text-white">{video.image_emoji || '🎥'}</span>
                       </div>
                     )}
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                       🎥 Video
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2">{video.title}</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-800 mb-2 line-clamp-2">{video.title}</h4>
                   <p className="text-xs text-gray-600 line-clamp-3">{video.summary}</p>
                 </div>
               ))}
@@ -602,12 +602,12 @@ export function EducationCenter({
           )}
           
           {viewMode === 'normal' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {getCurrentVideos().map((video) => (
-                <div key={video.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(video)}>
-                  <div className="mb-4">
+                <div key={video.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer" onClick={() => handleContentClick(video)}>
+                  <div className="mb-3 sm:mb-4">
                     {video.image_url ? (
-                      <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
+                      <div className="relative w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl overflow-hidden">
                         <img 
                           src={video.image_url} 
                           alt={video.title}
@@ -621,22 +621,22 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-red-400 to-pink-500 items-center justify-center">
-                          <span className="text-4xl text-white">{video.image_emoji || '🎥'}</span>
+                          <span className="text-2xl sm:text-4xl text-white">{video.image_emoji || '🎥'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
-                        <span className="text-4xl text-white">{video.image_emoji || '🎥'}</span>
+                      <div className="w-full h-24 sm:h-32 mb-2 sm:mb-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
+                        <span className="text-2xl sm:text-4xl text-white">{video.image_emoji || '🎥'}</span>
                       </div>
                     )}
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                    <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                       🎥 Video
                     </span>
                   </div>
-                  <h4 className="text-lg font-bold text-gray-800 mb-3">{video.title}</h4>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-4">{video.summary}</p>
+                  <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3">{video.title}</h4>
+                  <p className="text-gray-600 text-sm mb-3 sm:mb-4 line-clamp-4">{video.summary}</p>
                   <div className="flex items-center justify-between">
-                    <span className="px-2 py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
+                    <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
                       {video.category}
                     </span>
                     <span className="text-xs text-gray-500">{video.duration || 'Video corto'}</span>
@@ -647,12 +647,12 @@ export function EducationCenter({
           )}
           
           {viewMode === 'list' && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {getCurrentVideos().map((video) => (
-                <div key={video.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => handleContentClick(video)}>
+                <div key={video.id} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer" onClick={() => handleContentClick(video)}>
                   <div className="flex-shrink-0">
                     {video.image_url ? (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                      <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden">
                         <img 
                           src={video.image_url} 
                           alt={video.title}
@@ -666,25 +666,25 @@ export function EducationCenter({
                           }}
                         />
                         <div className="hidden absolute inset-0 bg-gradient-to-br from-red-400 to-pink-500 items-center justify-center">
-                          <span className="text-xl text-white">{video.image_emoji || '🎥'}</span>
+                          <span className="text-lg sm:text-xl text-white">{video.image_emoji || '🎥'}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
-                        <span className="text-xl text-white">{video.image_emoji || '🎥'}</span>
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center">
+                        <span className="text-lg sm:text-xl text-white">{video.image_emoji || '🎥'}</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h4 className="text-lg font-bold text-gray-800">{video.title}</h4>
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                      <h4 className="text-sm sm:text-lg font-bold text-gray-800 truncate">{video.title}</h4>
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 flex-shrink-0">
                         🎥 Video
                       </span>
                     </div>
-                    <p className="text-gray-600 text-sm line-clamp-2">{video.summary}</p>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <span className="px-2 py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
+                    <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">{video.summary}</p>
+                    <div className="flex items-center space-x-2 sm:space-x-4 mt-2">
+                      <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg text-xs font-medium bg-green-100 text-green-700">
                         {video.category}
                       </span>
                       <span className="text-xs text-gray-500">{video.duration || 'Video corto'}</span>
@@ -701,20 +701,21 @@ export function EducationCenter({
       
       {/* Contenido de Consejos */}
       {activeTab === 'tips' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {content.tips.map((tip, index) => (
-            <div key={index} className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-100 transition-all duration-300 hover:shadow-lg">
-              <p className="text-gray-700 font-medium">{tip}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          {getCurrentTips().map((tip, index) => (
+            <div key={index} className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-yellow-100 transition-all duration-300 hover:shadow-lg">
+              <p className="text-gray-700 font-medium text-sm sm:text-base">{tip}</p>
             </div>
           ))}
         </div>
       )}
       
       {/* Call to Action */}
-      <div className="mt-8 text-center">
+      <div className="mt-6 sm:mt-8 text-center">
         <Link href="/education">
-          <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
-            Explorar Todo el Contenido Educativo
+          <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
+            <span className="hidden sm:inline">Explorar Todo el Contenido Educativo</span>
+            <span className="sm:hidden">Explorar Contenido</span>
           </button>
         </Link>
       </div>

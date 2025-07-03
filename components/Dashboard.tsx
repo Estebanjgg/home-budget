@@ -417,7 +417,7 @@ export function Dashboard() {
             <span className="text-4xl">💰</span>
           </div>
           <div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Dashboard Financiero Premium
             </h1>
             <p className="text-xl text-gray-600">Tu centro de control financiero inteligente</p>

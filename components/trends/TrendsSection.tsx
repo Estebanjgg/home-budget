@@ -104,36 +104,38 @@ export function TrendsSection({
   const maxGroceryBudget = Math.max(...groceryTrends.map(m => m.groceryBudget), 1)
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="text-3xl font-bold text-gray-800 flex items-center">
-          <span className="bg-gradient-to-r from-blue-400 to-purple-500 rounded-full p-3 mr-4">
+    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 sm:mb-8 space-y-4 lg:space-y-0">
+        <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 flex items-center">
+          <span className="bg-gradient-to-r from-blue-400 to-purple-500 rounded-full p-2 sm:p-3 mr-3 sm:mr-4 flex-shrink-0">
             📊
           </span>
-          Análisis de Tendencias - Últimos 6 Meses
+          <span className="leading-tight">Análisis de Tendencias - Últimos 6 Meses</span>
         </h3>
         
         {/* Pestañas */}
-        <div className="flex bg-gray-100 rounded-2xl p-1">
+        <div className="flex bg-gray-100 rounded-xl sm:rounded-2xl p-1 w-full lg:w-auto">
           <button
             onClick={() => setActiveTab('general')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+            className={`flex-1 lg:flex-none px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
               activeTab === 'general'
                 ? 'bg-white text-blue-600 shadow-lg transform scale-105'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            💰 Presupuesto General
+            <span className="hidden sm:inline">💰 Presupuesto General</span>
+            <span className="sm:hidden">💰 Presupuesto</span>
           </button>
           <button
             onClick={() => setActiveTab('grocery')}
-            className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+            className={`flex-1 lg:flex-none px-3 sm:px-4 lg:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
               activeTab === 'grocery'
                 ? 'bg-white text-orange-600 shadow-lg transform scale-105'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            🛒 Gastos de Supermercado
+            <span className="hidden sm:inline">🛒 Gastos de Supermercado</span>
+            <span className="sm:hidden">🛒 Supermercado</span>
           </button>
         </div>
       </div>
@@ -150,12 +152,12 @@ export function TrendsSection({
             </p>
           </div>
           
-          <div className="grid grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-4">
             {monthlyData.map((month: any, index: number) => (
               <div key={index} className="text-center">
                 <div className="mb-2">
-                  <div className="text-sm font-medium text-gray-600 mb-1">{month.month}</div>
-                  <div className="relative h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                  <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{month.month}</div>
+                  <div className="relative h-24 sm:h-32 lg:h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 shadow-inner">
                     <div 
                       className="absolute bottom-0 left-0 w-1/2 bg-gradient-to-t from-green-500 to-green-400 rounded-tl-xl transition-all duration-1000 shadow-lg"
                       style={{ height: `${Math.min(100, Math.max((month.income / (Math.max(...monthlyData.map((m: any) => m.income)) || 1)) * 100, 5))}%` }}
@@ -167,10 +169,17 @@ export function TrendsSection({
                   </div>
                 </div>
                 <div className="text-xs space-y-1">
-                  <div className="text-green-600 font-medium">{formatCurrency(month.income)}</div>
-                  <div className="text-red-600 font-medium">{formatCurrency(month.expenses)}</div>
-                  <div className={`font-bold ${month.balance >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                    {month.balance >= 0 ? '+' : ''}{formatCurrency(month.balance)}
+                  <div className="text-green-600 font-medium text-xs sm:text-sm">
+                    <span className="hidden sm:inline">{formatCurrency(month.income)}</span>
+                    <span className="sm:hidden">${(month.income/1000).toFixed(0)}k</span>
+                  </div>
+                  <div className="text-red-600 font-medium text-xs sm:text-sm">
+                    <span className="hidden sm:inline">{formatCurrency(month.expenses)}</span>
+                    <span className="sm:hidden">${(month.expenses/1000).toFixed(0)}k</span>
+                  </div>
+                  <div className={`font-bold text-xs sm:text-sm ${month.balance >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                    <span className="hidden sm:inline">{month.balance >= 0 ? '+' : ''}{formatCurrency(month.balance)}</span>
+                    <span className="sm:hidden">{month.balance >= 0 ? '+' : ''}${(month.balance/1000).toFixed(0)}k</span>
                   </div>
                 </div>
               </div>
@@ -209,12 +218,12 @@ export function TrendsSection({
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-6 gap-4">
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-4">
                 {groceryTrends.map((month, index) => (
                   <div key={index} className="text-center">
                     <div className="mb-2">
-                      <div className="text-sm font-medium text-gray-600 mb-1">{month.month}</div>
-                      <div className="relative h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                      <div className="text-xs sm:text-sm font-medium text-gray-600 mb-1">{month.month}</div>
+                      <div className="relative h-24 sm:h-32 lg:h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 shadow-inner">
                         {/* Presupuesto recomendado (fondo) */}
                         <div 
                           className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-gray-300 to-gray-200 rounded-xl transition-all duration-1000"
@@ -232,19 +241,21 @@ export function TrendsSection({
                       </div>
                     </div>
                     <div className="text-xs space-y-1">
-                      <div className={`font-medium ${
+                      <div className={`font-medium text-xs sm:text-sm ${
                         month.grocerySpent <= month.groceryBudget ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        {formatCurrency(month.grocerySpent)}
+                        <span className="hidden sm:inline">{formatCurrency(month.grocerySpent)}</span>
+                        <span className="sm:hidden">${(month.grocerySpent/1000).toFixed(0)}k</span>
                       </div>
-                      <div className="text-gray-500">
-                        Meta: {formatCurrency(month.groceryBudget)}
+                      <div className="text-gray-500 text-xs sm:text-sm">
+                        <span className="hidden sm:inline">Meta: {formatCurrency(month.groceryBudget)}</span>
+                        <span className="sm:hidden">${(month.groceryBudget/1000).toFixed(0)}k</span>
                       </div>
                       <div className={`font-bold text-xs ${
                         month.groceryPercentage <= 25 ? 'text-green-700' : 
                         month.groceryPercentage <= 35 ? 'text-yellow-700' : 'text-red-700'
                       }`}>
-                        {month.groceryPercentage.toFixed(1)}% ingresos
+                        {month.groceryPercentage.toFixed(1)}%
                       </div>
                     </div>
                   </div>

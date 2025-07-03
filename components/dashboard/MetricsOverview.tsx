@@ -181,19 +181,19 @@ export function MetricsOverview({ dashboardMetrics, groceryMetrics, formatCurren
         {/* Recomendaciones Inteligentes */}
         {(groceryMetrics.efficiency < 10 || groceryMetrics.percentageOfIncome > 25 || dashboardMetrics.savingsRate < 10) && (
           <div className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border-2 border-amber-200 shadow-2xl">
-            <div className="flex flex-col sm:flex-row sm:items-center mb-4 sm:mb-6 gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center mb-3 sm:mb-4 lg:mb-6 gap-2 sm:gap-3">
               <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-full p-2 sm:p-3 self-start sm:self-auto">
-                <span className="text-white text-lg sm:text-2xl">💡</span>
+                <span className="text-white text-base sm:text-lg lg:text-2xl">💡</span>
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-amber-800">Recomendaciones Personalizadas</h3>
+              <h3 className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-amber-800">Recomendaciones Personalizadas</h3>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
               {groceryMetrics.efficiency < 10 && (
-                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-amber-200 shadow-lg">
-                  <div className="flex items-center mb-3 sm:mb-4">
-                    <span className="text-lg sm:text-2xl mr-2 sm:mr-3">🎯</span>
-                    <h4 className="font-bold text-amber-800 text-sm sm:text-base">Optimizar Compras</h4>
+                <div className="bg-white rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 border border-amber-200 shadow-lg">
+                  <div className="flex items-center mb-2 sm:mb-3 lg:mb-4">
+                    <span className="text-base sm:text-lg lg:text-2xl mr-2 sm:mr-3">🎯</span>
+                    <h4 className="font-bold text-amber-800 text-sm sm:text-base lg:text-lg">Optimizar Compras</h4>
                   </div>
                   <p className="text-amber-700 text-xs sm:text-sm leading-relaxed">
                     Tu eficiencia de compras es baja ({groceryMetrics.efficiency.toFixed(1)}%). 
@@ -203,10 +203,10 @@ export function MetricsOverview({ dashboardMetrics, groceryMetrics, formatCurren
               )}
               
               {groceryMetrics.percentageOfIncome > 25 && (
-                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-amber-200 shadow-lg">
-                  <div className="flex items-center mb-3 sm:mb-4">
-                    <span className="text-lg sm:text-2xl mr-2 sm:mr-3">📉</span>
-                    <h4 className="font-bold text-amber-800 text-sm sm:text-base">Reducir Gastos</h4>
+                <div className="bg-white rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 border border-amber-200 shadow-lg">
+                  <div className="flex items-center mb-2 sm:mb-3 lg:mb-4">
+                    <span className="text-base sm:text-lg lg:text-2xl mr-2 sm:mr-3">📉</span>
+                    <h4 className="font-bold text-amber-800 text-sm sm:text-base lg:text-lg">Reducir Gastos</h4>
                   </div>
                   <p className="text-amber-700 text-xs sm:text-sm leading-relaxed">
                     Gastas {groceryMetrics.percentageOfIncome.toFixed(1)}% de tus ingresos en supermercado. 
@@ -216,10 +216,10 @@ export function MetricsOverview({ dashboardMetrics, groceryMetrics, formatCurren
               )}
               
               {dashboardMetrics.savingsRate < 10 && (
-                <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-amber-200 shadow-lg">
-                  <div className="flex items-center mb-3 sm:mb-4">
-                    <span className="text-lg sm:text-2xl mr-2 sm:mr-3">🏦</span>
-                    <h4 className="font-bold text-amber-800 text-sm sm:text-base">Aumentar Ahorros</h4>
+                <div className="bg-white rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 border border-amber-200 shadow-lg">
+                  <div className="flex items-center mb-2 sm:mb-3 lg:mb-4">
+                    <span className="text-base sm:text-lg lg:text-2xl mr-2 sm:mr-3">🏦</span>
+                    <h4 className="font-bold text-amber-800 text-sm sm:text-base lg:text-lg">Aumentar Ahorros</h4>
                   </div>
                   <p className="text-amber-700 text-xs sm:text-sm leading-relaxed">
                     Tu tasa de ahorro es {dashboardMetrics.savingsRate.toFixed(1)}%. 

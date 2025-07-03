@@ -27,21 +27,7 @@ export function FinancialAssistant({ budgets, currentBudgetItems, categories, fo
     applyCategorization
   } = useFinancialAI({ budgets, currentBudgetItems, categories })
 
-  // Debug: Verificar datos
-  console.log('FinancialAssistant Debug:', {
-    budgets: budgets.length,
-    currentBudgetItems: currentBudgetItems.length,
-    categories: categories.length,
-    spendingPatterns: spendingPatterns.length,
-    sampleItems: currentBudgetItems.slice(0, 3).map(item => ({
-      id: item.id,
-      description: item.description,
-      estimated_amount: item.estimated_amount,
-      actual_amount: item.actual_amount,
-      type: item.type,
-      category: item.category?.name
-    }))
-  })
+  // Debug removido para evitar spam en consola
 
   // Función para manejar la aplicación de categorización
   const handleApplyCategorization = async (suggestion: any) => {

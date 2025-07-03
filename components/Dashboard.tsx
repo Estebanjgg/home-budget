@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
 import { useBudgetItems } from '@/hooks/useBudgetItems'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
@@ -16,6 +16,8 @@ import { AdvancedCharts } from './dashboard/AdvancedCharts'
 import { SmartAlerts } from './dashboard/SmartAlerts'
 import { FinancialAssistant } from './ai/FinancialAssistant'
 import { Toaster } from 'react-hot-toast'
+import PWAInstaller from './PWAInstaller'
+import { useSwipeGestures } from '../hooks/useSwipeGestures'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -65,6 +67,8 @@ export function Dashboard() {
   const [categoryExpenses, setCategoryExpenses] = useState<{ [category: string]: number }>({})
   const [currentBudgetItems, setCurrentBudgetItems] = useState<BudgetItem[]>([])
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
   
   // Get current month budget for FinancialAssistant
   const currentDate = new Date()
@@ -75,8 +79,8 @@ export function Dashboard() {
   // Use useBudgetItems hook to get items and categories
   const { items, categories: budgetCategories } = useBudgetItems(currentBudget?.id || null)
 
-  // Calcular métricas del dashboard
-  const calculateDashboardMetrics = async () => {
+  // Calcular métricas del dashboard con useCallback para evitar re-creación
+  const calculateDashboardMetrics = useCallback(async () => {
     if (budgets.length === 0) return
 
     const currentDate = new Date()
@@ -189,13 +193,13 @@ export function Dashboard() {
       percentageOfIncome: totalIncome > 0 ? (totalGroceries / totalIncome) * 100 : 0,
       efficiency: groceryBudgetTotal > 0 ? ((groceryBudgetTotal - totalGroceries) / groceryBudgetTotal) * 100 : 0
     })
-  }
+  }, [budgets, items, budgetCategories])
 
   useEffect(() => {
     if (budgets.length > 0) {
       calculateDashboardMetrics()
     }
-  }, [budgets])
+  }, [budgets, calculateDashboardMetrics])
 
   // Update currentBudgetItems when items change
   useEffect(() => {
@@ -207,14 +211,44 @@ export function Dashboard() {
     setCategories(budgetCategories)
   }, [budgetCategories])
 
-  const formatCurrency = (amount: number) => {
+  // Define sections for swipe navigation with useMemo to prevent re-creation
+  const sections = useMemo(() => [
+    'metrics',
+    'health',
+    'alerts',
+    'actions',
+    'charts',
+    'trends',
+    'assistant',
+    'education',
+    'summary'
+  ], [])
+
+  // Handle swipe navigation with useCallback to prevent re-creation
+  const handleSwipeLeft = useCallback(() => {
+    setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))
+  }, [sections.length])
+
+  const handleSwipeRight = useCallback(() => {
+    setCurrentSectionIndex(prev => Math.max(prev - 1, 0))
+  }, [])
+
+  // Use swipe gestures hook
+  useSwipeGestures({
+    onSwipeLeft: handleSwipeLeft,
+    onSwipeRight: handleSwipeRight,
+    element: containerRef.current
+  })
+
+  // Memoize formatCurrency to prevent re-creation
+  const formatCurrency = useCallback((amount: number) => {
     return '$' + new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
-  }
+  }, [])
 
-  const handleContentClick = (contentItem: EducationalContentItem) => {
+  const handleContentClick = useCallback((contentItem: EducationalContentItem) => {
     if (contentItem.type === 'video' && contentItem.url) {
       setSelectedVideo(contentItem as EducationalContent)
     } else if (contentItem.type === 'article') {
@@ -222,7 +256,7 @@ export function Dashboard() {
     } else if (contentItem.url) {
       window.open(contentItem.url, '_blank')
     }
-  }
+  }, [])
 
   if (loading || educationLoading) {
     return (
@@ -477,7 +511,8 @@ export function Dashboard() {
   }
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
+    <div ref={containerRef} className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
+      <PWAInstaller />
       {showAdminPanel && (
         <EducationAdmin onClose={() => setShowAdminPanel(false)} />
       )}
@@ -513,135 +548,375 @@ export function Dashboard() {
 
       {dashboardMetrics && (
         <>
-          <MetricsOverview 
-            dashboardMetrics={dashboardMetrics}
-            groceryMetrics={groceryMetrics}
-            formatCurrency={formatCurrency}
-          />
+          {/* Section Navigation Indicators */}
+          <div className="mb-6 md:hidden">
+            {/* Current Section Title */}
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-bold text-gray-800 capitalize">
+                {sections[currentSectionIndex] === 'metrics' && '📊 Métricas'}
+                {sections[currentSectionIndex] === 'health' && '💚 Salud Financiera'}
+                {sections[currentSectionIndex] === 'alerts' && '🚨 Alertas'}
+                {sections[currentSectionIndex] === 'actions' && '⚡ Acciones Rápidas'}
+                {sections[currentSectionIndex] === 'charts' && '📈 Gráficos'}
+                {sections[currentSectionIndex] === 'trends' && '📊 Tendencias'}
+                {sections[currentSectionIndex] === 'assistant' && '🤖 Asistente IA'}
+                {sections[currentSectionIndex] === 'education' && '📚 Educación'}
+                {sections[currentSectionIndex] === 'summary' && '📋 Resumen'}
+              </h2>
+              <p className="text-sm text-gray-500">
+                Sección {currentSectionIndex + 1} de {sections.length}
+              </p>
+            </div>
+            
+            {/* Navigation Dots */}
+            <div className="flex justify-center space-x-2">
+              {sections.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSectionIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentSectionIndex 
+                      ? 'bg-blue-500 w-6' 
+                      : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
 
-          <FinancialHealthIndicators 
-            dashboardMetrics={dashboardMetrics}
-            groceryMetrics={groceryMetrics}
-            formatCurrency={formatCurrency}
-          />
+          {/* Navigation Controls for Mobile */}
+          <div className="md:hidden mb-4">
+            {/* Swipe Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 text-center">
+              <p className="text-sm text-blue-700">
+                👈 Desliza para navegar entre secciones 👉
+              </p>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => setCurrentSectionIndex(prev => Math.max(prev - 1, 0))}
+                disabled={currentSectionIndex === 0}
+                className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                  currentSectionIndex === 0
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
+                }`}
+              >
+                <span className="mr-2">←</span>
+                Anterior
+              </button>
+              
+              <div className="text-center">
+                <span className="text-sm text-gray-500 font-medium">
+                  {currentSectionIndex + 1} / {sections.length}
+                </span>
+              </div>
+              
+              <button
+                onClick={() => setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))}
+                disabled={currentSectionIndex === sections.length - 1}
+                className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                  currentSectionIndex === sections.length - 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
+                }`}
+              >
+                Siguiente
+                <span className="ml-2">→</span>
+              </button>
+            </div>
+          </div>
 
-          <SmartAlerts
-            monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
-            monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
-            budgetLimits={budgetLimits}
-            categoryExpenses={categoryExpenses}
-            formatCurrency={formatCurrency}
-          />
-
-          <QuickActions 
-            dashboardMetrics={dashboardMetrics}
-            groceryMetrics={groceryMetrics}
-            formatCurrency={formatCurrency}
-          />
-
-          <AdvancedCharts
-            monthlyData={dashboardMetrics.monthlyData || []}
-            formatCurrency={formatCurrency}
-          />
-
-          {dashboardMetrics.monthlyData && (
-            <TrendsSection 
-              monthlyData={dashboardMetrics.monthlyData}
+          {/* Desktop: Show all sections */}
+          <div className="hidden md:block space-y-8">
+            <MetricsOverview 
+              dashboardMetrics={dashboardMetrics}
               groceryMetrics={groceryMetrics}
               formatCurrency={formatCurrency}
-              budgets={budgets}
-              calculateSummary={calculateSummary}
             />
-          )}
-          
-          <FinancialAssistant 
-            budgets={budgets}
-            currentBudgetItems={currentBudgetItems}
-            categories={categories}
-            formatCurrency={formatCurrency}
-          />
 
-          <EducationCenter 
-            dashboardMetrics={dashboardMetrics}
-            groceryMetrics={groceryMetrics}
-            formatCurrency={formatCurrency}
-            educationalContent={educationalContent}
-            featuredContent={featuredContent}
-            handleContentClick={handleContentClick}
-          />
+            <FinancialHealthIndicators 
+              dashboardMetrics={dashboardMetrics}
+              groceryMetrics={groceryMetrics}
+              formatCurrency={formatCurrency}
+            />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
-              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
-                  📈
-                </span>
-                <span className="leading-tight">Ratio de Gastos</span>
-              </h4>
-              <div className="relative">
-                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
-                  <div 
-                    className="bg-gradient-to-r from-yellow-400 to-red-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
-                    style={{ width: `${Math.min(dashboardMetrics.expenseRatio, 100)}%` }}
-                  ></div>
+            <SmartAlerts
+              monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
+              monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
+              budgetLimits={budgetLimits}
+              categoryExpenses={categoryExpenses}
+              formatCurrency={formatCurrency}
+            />
+
+            <QuickActions 
+              dashboardMetrics={dashboardMetrics}
+              groceryMetrics={groceryMetrics}
+              formatCurrency={formatCurrency}
+            />
+
+            <AdvancedCharts
+              monthlyData={dashboardMetrics.monthlyData || []}
+              formatCurrency={formatCurrency}
+            />
+
+            {dashboardMetrics.monthlyData && (
+              <TrendsSection 
+                monthlyData={dashboardMetrics.monthlyData}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+                budgets={budgets}
+                calculateSummary={calculateSummary}
+              />
+            )}
+            
+            <FinancialAssistant 
+              budgets={budgets}
+              currentBudgetItems={currentBudgetItems}
+              categories={categories}
+              formatCurrency={formatCurrency}
+            />
+
+            <EducationCenter 
+              dashboardMetrics={dashboardMetrics}
+              groceryMetrics={groceryMetrics}
+              formatCurrency={formatCurrency}
+              educationalContent={educationalContent}
+              featuredContent={featuredContent}
+              handleContentClick={handleContentClick}
+            />
+          </div>
+
+          {/* Mobile: Show current section only */}
+          <div className="md:hidden">
+            {currentSectionIndex === 0 && (
+              <MetricsOverview 
+                dashboardMetrics={dashboardMetrics}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 1 && (
+              <FinancialHealthIndicators 
+                dashboardMetrics={dashboardMetrics}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 2 && (
+              <SmartAlerts
+                monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
+                monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
+                budgetLimits={budgetLimits}
+                categoryExpenses={categoryExpenses}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 3 && (
+              <QuickActions 
+                dashboardMetrics={dashboardMetrics}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 4 && (
+              <AdvancedCharts
+                monthlyData={dashboardMetrics.monthlyData || []}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 5 && dashboardMetrics.monthlyData && (
+              <TrendsSection 
+                monthlyData={dashboardMetrics.monthlyData}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+                budgets={budgets}
+                calculateSummary={calculateSummary}
+              />
+            )}
+            
+            {currentSectionIndex === 6 && (
+              <FinancialAssistant 
+                budgets={budgets}
+                currentBudgetItems={currentBudgetItems}
+                categories={categories}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {currentSectionIndex === 7 && (
+              <EducationCenter 
+                dashboardMetrics={dashboardMetrics}
+                groceryMetrics={groceryMetrics}
+                formatCurrency={formatCurrency}
+                educationalContent={educationalContent}
+                featuredContent={featuredContent}
+                handleContentClick={handleContentClick}
+              />
+            )}
+            
+            {currentSectionIndex === 8 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                      📈
+                    </span>
+                    <span className="leading-tight">Ratio de Gastos</span>
+                  </h4>
+                  <div className="relative">
+                    <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-400 to-red-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
+                        style={{ width: `${Math.min(dashboardMetrics.expenseRatio, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm text-gray-600">
+                      <span>0%</span>
+                      <span className="font-bold">{dashboardMetrics.expenseRatio.toFixed(1)}%</span>
+                      <span>100%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
+                    {dashboardMetrics.expenseRatio < 70 ? '✅ Excelente control' : 
+                      dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
+                  </p>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm text-gray-600">
-                  <span>0%</span>
-                  <span className="font-bold">{dashboardMetrics.expenseRatio.toFixed(1)}%</span>
-                  <span>100%</span>
+
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                    <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                      🏦
+                    </span>
+                    <span className="leading-tight">Tasa de Ahorro</span>
+                  </h4>
+                  <div className="relative">
+                    <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-400 to-green-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
+                        style={{ width: `${Math.min(dashboardMetrics.savingsRate, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm text-gray-600">
+                      <span>0%</span>
+                      <span className="font-bold">{dashboardMetrics.savingsRate.toFixed(1)}%</span>
+                      <span>30%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
+                    {dashboardMetrics.savingsRate >= 20 ? '🌟 Excelente' : 
+                      dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 sm:col-span-2 lg:col-span-1">
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                    <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                      ⚡
+                    </span>
+                    <span className="leading-tight">Resumen Rápido</span>
+                  </h4>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 text-sm sm:text-base">Presupuestos:</span>
+                      <span className="font-bold text-gray-800 text-base sm:text-lg">{dashboardMetrics.budgetCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 text-sm sm:text-base">Diezmo total:</span>
+                      <span className="font-bold text-purple-600 text-base sm:text-lg">{formatCurrency(dashboardMetrics.totalTithe)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 text-sm sm:text-base">Promedio mensual:</span>
+                      <span className="font-bold text-blue-600 text-base sm:text-lg">{formatCurrency((dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) / Math.max(dashboardMetrics.budgetCount, 1))}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
-                {dashboardMetrics.expenseRatio < 70 ? '✅ Excelente control' : 
-                  dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
-              </p>
-            </div>
+            )}
+          </div>
 
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
-              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
-                  🏦
-                </span>
-                <span className="leading-tight">Tasa de Ahorro</span>
-              </h4>
-              <div className="relative">
-                <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
-                  <div 
-                    className="bg-gradient-to-r from-blue-400 to-green-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
-                    style={{ width: `${Math.min(dashboardMetrics.savingsRate, 100)}%` }}
-                  ></div>
+          {/* Desktop: Additional summary section */}
+          <div className="hidden md:block">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+                <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                    📈
+                  </span>
+                  <span className="leading-tight">Ratio de Gastos</span>
+                </h4>
+                <div className="relative">
+                  <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
+                    <div 
+                      className="bg-gradient-to-r from-yellow-400 to-red-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
+                      style={{ width: `${Math.min(dashboardMetrics.expenseRatio, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs sm:text-sm text-gray-600">
+                    <span>0%</span>
+                    <span className="font-bold">{dashboardMetrics.expenseRatio.toFixed(1)}%</span>
+                    <span>100%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm text-gray-600">
-                  <span>0%</span>
-                  <span className="font-bold">{dashboardMetrics.savingsRate.toFixed(1)}%</span>
-                  <span>30%</span>
-                </div>
+                <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
+                  {dashboardMetrics.expenseRatio < 70 ? '✅ Excelente control' : 
+                    dashboardMetrics.expenseRatio < 85 ? '⚠️ Moderado' : '🚨 Alto riesgo'}
+                </p>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
-                {dashboardMetrics.savingsRate >= 20 ? '🌟 Excelente' : 
-                  dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
-              </p>
-            </div>
 
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 sm:col-span-2 lg:col-span-1">
-              <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
-                  ⚡
-                </span>
-                <span className="leading-tight">Resumen Rápido</span>
-              </h4>
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 text-sm sm:text-base">Presupuestos:</span>
-                  <span className="font-bold text-gray-800 text-base sm:text-lg">{dashboardMetrics.budgetCount}</span>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+                <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                  <span className="bg-gradient-to-r from-blue-400 to-green-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                    🏦
+                  </span>
+                  <span className="leading-tight">Tasa de Ahorro</span>
+                </h4>
+                <div className="relative">
+                  <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 mb-2">
+                    <div 
+                      className="bg-gradient-to-r from-blue-400 to-green-500 h-3 sm:h-4 rounded-full transition-all duration-1000"
+                      style={{ width: `${Math.min(dashboardMetrics.savingsRate, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs sm:text-sm text-gray-600">
+                    <span>0%</span>
+                    <span className="font-bold">{dashboardMetrics.savingsRate.toFixed(1)}%</span>
+                    <span>30%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 text-sm sm:text-base">Diezmo total:</span>
-                  <span className="font-bold text-purple-600 text-base sm:text-lg">{formatCurrency(dashboardMetrics.totalTithe)}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600 text-sm sm:text-base">Promedio mensual:</span>
-                  <span className="font-bold text-blue-600 text-base sm:text-lg">{formatCurrency((dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) / Math.max(dashboardMetrics.budgetCount, 1))}</span>
+                <p className="text-xs sm:text-sm text-gray-500 mt-2 leading-relaxed">
+                  {dashboardMetrics.savingsRate >= 20 ? '🌟 Excelente' : 
+                    dashboardMetrics.savingsRate >= 10 ? '👍 Bueno' : '📈 Mejorable'}
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-100 sm:col-span-2 lg:col-span-1">
+                <h4 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                  <span className="bg-gradient-to-r from-purple-400 to-pink-500 rounded-full p-1.5 sm:p-2 mr-2 sm:mr-3 flex-shrink-0">
+                    ⚡
+                  </span>
+                  <span className="leading-tight">Resumen Rápido</span>
+                </h4>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 text-sm sm:text-base">Presupuestos:</span>
+                    <span className="font-bold text-gray-800 text-base sm:text-lg">{dashboardMetrics.budgetCount}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 text-sm sm:text-base">Diezmo total:</span>
+                    <span className="font-bold text-purple-600 text-base sm:text-lg">{formatCurrency(dashboardMetrics.totalTithe)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600 text-sm sm:text-base">Promedio mensual:</span>
+                    <span className="font-bold text-blue-600 text-base sm:text-lg">{formatCurrency((dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) / Math.max(dashboardMetrics.budgetCount, 1))}</span>
+                  </div>
                 </div>
               </div>
             </div>

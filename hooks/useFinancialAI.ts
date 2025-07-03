@@ -429,7 +429,6 @@ export function useFinancialAI({ budgets, currentBudgetItems, categories }: UseF
   // Función para aplicar categorización automática
   const applyCategorization = async (suggestion: CategorizationSuggestion) => {
     // Aquí se implementaría la lógica para actualizar la categoría del item
-    console.log('Aplicando categorización:', suggestion)
     // TODO: Implementar actualización en base de datos
   }
 

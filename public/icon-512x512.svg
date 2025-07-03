@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="64" fill="url(#gradient)"/>
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Main circle background -->
+  <circle cx="256" cy="256" r="160" fill="white" opacity="0.95"/>
+  
+  <!-- Dollar sign icon -->
+  <path d="M256 150v212M206 200h50c23.196 0 42 18.804 42 42s-18.804 42-42 42H206M206 310h50c23.196 0 42-18.804 42-42s-18.804-42-42-42H206" 
+        stroke="#3B82F6" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Budget chart elements -->
+  <rect x="160" y="380" width="20" height="50" fill="#10B981" rx="6"/>
+  <rect x="190" y="350" width="20" height="80" fill="#F59E0B" rx="6"/>
+  <rect x="220" y="330" width="20" height="100" fill="#EF4444" rx="6"/>
+  <rect x="292" y="360" width="20" height="70" fill="#8B5CF6" rx="6"/>
+  <rect x="322" y="340" width="20" height="90" fill="#06B6D4" rx="6"/>
+  <rect x="352" y="385" width="20" height="45" fill="#84CC16" rx="6"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="180" cy="120" r="8" fill="#F59E0B" opacity="0.7"/>
+  <circle cx="340" cy="140" r="6" fill="#10B981" opacity="0.7"/>
+  <circle cx="380" cy="200" r="10" fill="#EF4444" opacity="0.7"/>
+  <circle cx="120" cy="180" r="7" fill="#8B5CF6" opacity="0.7"/>
+  <circle cx="140" cy="320" r="9" fill="#06B6D4" opacity="0.7"/>
+  <circle cx="380" cy="320" r="8" fill="#84CC16" opacity="0.7"/>
+</svg>

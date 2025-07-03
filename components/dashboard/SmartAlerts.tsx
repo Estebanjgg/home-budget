@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
-import { X, AlertTriangle, TrendingUp, TrendingDown, Target, DollarSign } from 'lucide-react'
+import { X, AlertTriangle, TrendingUp, TrendingDown, Target, DollarSign, Eye, EyeOff, Trash2, RotateCcw, CheckCircle, Info } from 'lucide-react'
+import { useSwipeGestures } from '../../hooks/useSwipeGestures'
 
 interface Alert {
   id: string
@@ -112,6 +113,8 @@ export function SmartAlerts({
   const [lastIncome, setLastIncome] = useState<number>(0)
   const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set())
   const [newAlertsToShow, setNewAlertsToShow] = useState<Alert[]>([])
+  const [swipingAlerts, setSwipingAlerts] = useState<Set<string>>(new Set())
+  const alertRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   // Cargar estado inicial desde localStorage
   useEffect(() => {
@@ -477,45 +480,90 @@ export function SmartAlerts({
               const priority = { danger: 4, warning: 3, info: 2, success: 1 }
               return priority[b.type] - priority[a.type]
             })
-            .map((alert) => (
-              <div
-                key={alert.id}
-                className={`border-l-4 p-3 sm:p-4 rounded-r-lg ${getAlertBorderColor(alert.type)} transition-all hover:shadow-md`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-2 sm:space-x-3 flex-1 min-w-0">
-                    <div className="flex-shrink-0">
-                      {getAlertIcon(alert.type)}
+            .map((alert) => {
+              const AlertComponent = () => {
+                const alertRef = useRef<HTMLDivElement>(null)
+                
+                // Configurar swipe para esta alerta específica
+                useSwipeGestures({
+                  onSwipeLeft: () => {
+                    setSwipingAlerts(prev => new Set([...prev, alert.id]))
+                    setTimeout(() => {
+                      dismissAlert(alert.id)
+                      setSwipingAlerts(prev => {
+                        const newSet = new Set(prev)
+                        newSet.delete(alert.id)
+                        return newSet
+                      })
+                    }, 300)
+                  },
+                  onSwipeRight: () => {
+                    setSwipingAlerts(prev => new Set([...prev, alert.id]))
+                    setTimeout(() => {
+                      dismissAlert(alert.id)
+                      setSwipingAlerts(prev => {
+                        const newSet = new Set(prev)
+                        newSet.delete(alert.id)
+                        return newSet
+                      })
+                    }, 300)
+                  },
+                  element: alertRef.current,
+                  threshold: 50
+                })
+                
+                const isSwipingThis = swipingAlerts.has(alert.id)
+                
+                return (
+                  <div
+                    ref={alertRef}
+                    className={`border-l-4 p-3 sm:p-4 rounded-r-lg ${getAlertBorderColor(alert.type)} transition-all duration-300 hover:shadow-md relative overflow-hidden ${
+                      isSwipingThis ? 'transform translate-x-full opacity-0' : 'transform translate-x-0 opacity-100'
+                    }`}
+                  >
+                    {/* Swipe indicator for mobile */}
+                    <div className="md:hidden absolute top-2 right-2 text-xs text-gray-400 opacity-50">
+                      👈 Desliza
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 mb-1">{alert.title}</h4>
-                      <p className="text-xs sm:text-sm text-gray-600 mb-2 break-words">{alert.message}</p>
-                      
-                      {alert.category && alert.amount && alert.limit && (
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs text-gray-500">
-                          <span>Categoría: {alert.category}</span>
-                          <span>Progreso: {((alert.amount / alert.limit) * 100).toFixed(0)}%</span>
+                    
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-2 sm:space-x-3 flex-1 min-w-0">
+                        <div className="flex-shrink-0">
+                          {getAlertIcon(alert.type)}
                         </div>
-                      )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm sm:text-base font-semibold text-gray-800 mb-1">{alert.title}</h4>
+                          <p className="text-xs sm:text-sm text-gray-600 mb-2 break-words">{alert.message}</p>
+                          
+                          {alert.category && alert.amount && alert.limit && (
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs text-gray-500">
+                              <span>Categoría: {alert.category}</span>
+                              <span>Progreso: {((alert.amount / alert.limit) * 100).toFixed(0)}%</span>
+                            </div>
+                          )}
+                          
+                          <p className="text-xs text-gray-400 mt-2">
+                            {alert.timestamp.toLocaleTimeString('es-ES', { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </p>
+                        </div>
+                      </div>
                       
-                      <p className="text-xs text-gray-400 mt-2">
-                        {alert.timestamp.toLocaleTimeString('es-ES', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
+                      <button
+                        onClick={() => dismissAlert(alert.id)}
+                        className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-1 sm:ml-2 flex-shrink-0"
+                      >
+                        <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                      </button>
                     </div>
                   </div>
-                  
-                  <button
-                    onClick={() => dismissAlert(alert.id)}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-1 sm:ml-2 flex-shrink-0"
-                  >
-                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
-                </div>
-              </div>
-            ))
+                )
+              }
+              
+              return <AlertComponent key={alert.id} />
+            })
         )}
       </div>
     </div>

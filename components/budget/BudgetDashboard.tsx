@@ -2,16 +2,28 @@
 
 import { useState, useEffect } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
+import { useBudgetItems } from '@/hooks/useBudgetItems'
 import { BudgetList } from './BudgetList'
 import { BudgetForm } from './BudgetForm'
 import { BudgetDetail } from './BudgetDetail'
-import type { Budget, BudgetSummary } from '@/lib/types'
+import { FinancialAssistant } from '../ai/FinancialAssistant'
+import type { Budget, BudgetSummary, BudgetItem, ExpenseCategory } from '@/lib/types'
 
 export function BudgetDashboard() {
   const { budgets, loading, error, addBudget, calculateSummary } = useBudgets()
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [dashboardMetrics, setDashboardMetrics] = useState<any>(null)
+  const [currentBudgetItems, setCurrentBudgetItems] = useState<BudgetItem[]>([])
+  const [categories, setCategories] = useState<ExpenseCategory[]>([])
+  
+  // Get current month budget for FinancialAssistant
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() + 1
+  const currentYear = currentDate.getFullYear()
+  const currentBudget = budgets.find(b => b.month === currentMonth && b.year === currentYear)
+  
+  const { items, categories: budgetCategories } = useBudgetItems(currentBudget?.id || null)
 
   // Calcular métricas del dashboard
   const calculateDashboardMetrics = async () => {
@@ -94,6 +106,14 @@ export function BudgetDashboard() {
       calculateDashboardMetrics()
     }
   }, [budgets])
+
+  useEffect(() => {
+    setCurrentBudgetItems(items)
+  }, [items])
+
+  useEffect(() => {
+    setCategories(budgetCategories)
+  }, [budgetCategories])
 
   const formatCurrency = (amount: number) => {
     return '$' + new Intl.NumberFormat('en-US', {
@@ -201,6 +221,16 @@ export function BudgetDashboard() {
                   </div>
                 </div>
               )}
+
+              {/* Asistente Financiero IA */}
+              <div className="mb-8">
+                <FinancialAssistant 
+                  budgets={budgets} 
+                  currentBudgetItems={currentBudgetItems}
+                  categories={categories}
+                  formatCurrency={formatCurrency}
+                />
+              </div>
 
               {/* Gráfico de Tendencias Mensuales */}
               {dashboardMetrics && dashboardMetrics.monthlyData && (

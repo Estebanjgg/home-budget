@@ -368,22 +368,22 @@ export function SmartAlerts({
   const warningAlerts = activeAlerts.filter(alert => alert.type === 'warning')
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
       {/* Header - siempre visible */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg ${
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className={`p-1.5 sm:p-2 rounded-lg ${
             criticalAlerts.length > 0 ? 'bg-red-100' : 
             warningAlerts.length > 0 ? 'bg-yellow-100' : 'bg-green-100'
           }`}>
-            <AlertTriangle className={`w-6 h-6 ${
+            <AlertTriangle className={`w-5 h-5 sm:w-6 sm:h-6 ${
               criticalAlerts.length > 0 ? 'text-red-600' : 
               warningAlerts.length > 0 ? 'text-yellow-600' : 'text-green-600'
             }`} />
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">🛡️ Alertas Inteligentes</h3>
-            <p className="text-sm text-gray-600">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800">🛡️ Alertas Inteligentes</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
               {showAlerts ? 
                 `${activeAlerts.length} alerta${activeAlerts.length !== 1 ? 's' : ''} activa${activeAlerts.length !== 1 ? 's' : ''}` :
                 'Alertas ocultas'
@@ -393,24 +393,24 @@ export function SmartAlerts({
         </div>
         
         {/* Controles - siempre visibles */}
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
           <button
             onClick={toggleAlertsVisibility}
-            className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-2 sm:px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap"
           >
             {showAlerts ? 'Ocultar' : 'Mostrar'}
           </button>
           {showAlerts && activeAlerts.length > 0 && (
             <button
               onClick={clearAllAlerts}
-              className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-2 sm:px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap"
             >
               Limpiar Todo
             </button>
           )}
           <button
             onClick={resetAllAlerts}
-            className="px-3 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
+            className="px-2 sm:px-3 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors whitespace-nowrap"
           >
             Reset
           </button>
@@ -418,57 +418,57 @@ export function SmartAlerts({
       </div>
 
       {/* Resumen de alertas */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-red-800">Críticas</p>
-              <p className="text-2xl font-bold text-red-600">{criticalAlerts.length}</p>
+              <p className="text-xs sm:text-sm font-medium text-red-800">Críticas</p>
+              <p className="text-xl sm:text-2xl font-bold text-red-600">{criticalAlerts.length}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+            <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
           </div>
         </div>
         
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-yellow-800">Advertencias</p>
-              <p className="text-2xl font-bold text-yellow-600">{warningAlerts.length}</p>
+              <p className="text-xs sm:text-sm font-medium text-yellow-800">Advertencias</p>
+              <p className="text-xl sm:text-2xl font-bold text-yellow-600">{warningAlerts.length}</p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-yellow-500" />
+            <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
           </div>
         </div>
         
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-800">Informativas</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-xs sm:text-sm font-medium text-blue-800">Informativas</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600">
                 {activeAlerts.filter(a => a.type === 'info' || a.type === 'success').length}
               </p>
             </div>
-            <TrendingUp className="w-8 h-8 text-blue-500" />
+            <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
           </div>
         </div>
       </div>
 
       {/* Lista de alertas */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="space-y-2 sm:space-y-3 max-h-96 overflow-y-auto">
         {!showAlerts ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-gray-600" />
+          <div className="text-center py-6 sm:py-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Target className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">Alertas ocultas</h4>
-            <p className="text-gray-600">Haz clic en "Mostrar" para ver las alertas.</p>
+            <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Alertas ocultas</h4>
+            <p className="text-sm sm:text-base text-gray-600">Haz clic en "Mostrar" para ver las alertas.</p>
           </div>
         ) : activeAlerts.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-green-600" />
+          <div className="text-center py-6 sm:py-8">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <Target className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">¡Todo en orden!</h4>
-            <p className="text-gray-600">No hay alertas activas. Tus finanzas están bajo control.</p>
+            <h4 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">¡Todo en orden!</h4>
+            <p className="text-sm sm:text-base text-gray-600">No hay alertas activas. Tus finanzas están bajo control.</p>
           </div>
         ) : (
           activeAlerts
@@ -480,17 +480,19 @@ export function SmartAlerts({
             .map((alert) => (
               <div
                 key={alert.id}
-                className={`border-l-4 p-4 rounded-r-lg ${getAlertBorderColor(alert.type)} transition-all hover:shadow-md`}
+                className={`border-l-4 p-3 sm:p-4 rounded-r-lg ${getAlertBorderColor(alert.type)} transition-all hover:shadow-md`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1">
-                    {getAlertIcon(alert.type)}
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 mb-1">{alert.title}</h4>
-                      <p className="text-sm text-gray-600 mb-2">{alert.message}</p>
+                  <div className="flex items-start space-x-2 sm:space-x-3 flex-1 min-w-0">
+                    <div className="flex-shrink-0">
+                      {getAlertIcon(alert.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 mb-1">{alert.title}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2 break-words">{alert.message}</p>
                       
                       {alert.category && alert.amount && alert.limit && (
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-xs text-gray-500">
                           <span>Categoría: {alert.category}</span>
                           <span>Progreso: {((alert.amount / alert.limit) * 100).toFixed(0)}%</span>
                         </div>
@@ -507,9 +509,9 @@ export function SmartAlerts({
                   
                   <button
                     onClick={() => dismissAlert(alert.id)}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-2"
+                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors ml-1 sm:ml-2 flex-shrink-0"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useBudgets } from '@/hooks/useBudgets'
+import { useBudgetItems } from '@/hooks/useBudgetItems'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 import { getBudgetItems } from '@/lib/budget-queries'
 import { EducationAdmin } from './education/EducationAdmin'
@@ -13,6 +14,7 @@ import { QuickActions } from './dashboard/QuickActions'
 import { EducationCenter } from './dashboard/EducationCenter'
 import { AdvancedCharts } from './dashboard/AdvancedCharts'
 import { SmartAlerts } from './dashboard/SmartAlerts'
+import { FinancialAssistant } from './ai/FinancialAssistant'
 import { Toaster } from 'react-hot-toast'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
@@ -61,6 +63,17 @@ export function Dashboard() {
   const [selectedArticle, setSelectedArticle] = useState<EducationalContent | null>(null)
   const [budgetLimits, setBudgetLimits] = useState<{ [category: string]: number }>({})
   const [categoryExpenses, setCategoryExpenses] = useState<{ [category: string]: number }>({})
+  const [currentBudgetItems, setCurrentBudgetItems] = useState<BudgetItem[]>([])
+  const [categories, setCategories] = useState<ExpenseCategory[]>([])
+  
+  // Get current month budget for FinancialAssistant
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth() + 1
+  const currentYear = currentDate.getFullYear()
+  const currentBudget = budgets.find(b => b.month === currentMonth && b.year === currentYear)
+  
+  // Use useBudgetItems hook to get items and categories
+  const { items, categories: budgetCategories } = useBudgetItems(currentBudget?.id || null)
 
   // Calcular métricas del dashboard
   const calculateDashboardMetrics = async () => {
@@ -183,6 +196,16 @@ export function Dashboard() {
       calculateDashboardMetrics()
     }
   }, [budgets])
+
+  // Update currentBudgetItems when items change
+  useEffect(() => {
+    setCurrentBudgetItems(items)
+  }, [items])
+
+  // Update categories when budgetCategories change
+  useEffect(() => {
+    setCategories(budgetCategories)
+  }, [budgetCategories])
 
   const formatCurrency = (amount: number) => {
     return '$' + new Intl.NumberFormat('en-US', {
@@ -531,6 +554,13 @@ export function Dashboard() {
             />
           )}
           
+          <FinancialAssistant 
+            budgets={budgets}
+            currentBudgetItems={currentBudgetItems}
+            categories={categories}
+            formatCurrency={formatCurrency}
+          />
+
           <EducationCenter 
             dashboardMetrics={dashboardMetrics}
             groceryMetrics={groceryMetrics}

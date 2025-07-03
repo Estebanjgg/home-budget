@@ -52,7 +52,7 @@ export function ArticleViewer({ article, onClose }: ArticleViewerProps) {
               <img
                 src={article.image_url}
                 alt={article.title}
-                className="w-full h-64 object-cover rounded-2xl shadow-lg"
+                className="w-full max-h-96 object-contain bg-gray-50 rounded-2xl shadow-lg"
               />
             </div>
           )}

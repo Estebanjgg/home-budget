@@ -6,6 +6,11 @@ import { EducationAdmin } from './education/EducationAdmin'
 import { FeaturedVideos } from './education/FeaturedVideos'
 import { VideoPlayer } from './education/VideoPlayer'
 import { ArticleViewer } from './education/ArticleViewer'
+import { TrendsSection } from './trends/TrendsSection'
+import { MetricsOverview } from './dashboard/MetricsOverview'
+import { FinancialHealthIndicators } from './dashboard/FinancialHealthIndicators'
+import { QuickActions } from './dashboard/QuickActions'
+import { EducationCenter } from './dashboard/EducationCenter'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -437,291 +442,42 @@ export function Dashboard() {
 
       {dashboardMetrics && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-gradient-to-br from-green-400 via-green-500 to-green-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-green-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm font-medium mb-1">💰 Total Ingresos</p>
-                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalIncome)}</p>
-                  <p className="text-green-100 text-xs mt-2">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyIncome)}/mes</p>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-full p-3">
-                  <span className="text-2xl">📈</span>
-                </div>
-              </div>
-            </div>
+          <MetricsOverview 
+            dashboardMetrics={dashboardMetrics}
+            groceryMetrics={groceryMetrics}
+            formatCurrency={formatCurrency}
+          />
 
-            <div className="bg-gradient-to-br from-red-400 via-red-500 to-red-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-red-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-100 text-sm font-medium mb-1">💸 Total Gastos</p>
-                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalExpenses)}</p>
-                  <p className="text-red-100 text-xs mt-2">Promedio: {formatCurrency(dashboardMetrics.averageMonthlyExpenses)}/mes</p>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-full p-3">
-                  <span className="text-2xl">📉</span>
-                </div>
-              </div>
-            </div>
+          <FinancialHealthIndicators 
+            dashboardMetrics={dashboardMetrics}
+            groceryMetrics={groceryMetrics}
+            formatCurrency={formatCurrency}
+          />
 
-            <div className="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300 border border-blue-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium mb-1">🏦 Total Ahorros</p>
-                  <p className="text-3xl font-bold">{formatCurrency(dashboardMetrics.totalSavings)}</p>
-                  <p className="text-blue-100 text-xs mt-2">Tasa: {dashboardMetrics.savingsRate.toFixed(1)}%</p>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-full p-3">
-                  <span className="text-2xl">💎</span>
-                </div>
-              </div>
-            </div>
-
-            <div className={`bg-gradient-to-br ${(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? 'from-purple-400 via-purple-500 to-purple-600 border-purple-300' : 'from-orange-400 via-orange-500 to-orange-600 border-orange-300'} rounded-3xl p-6 text-white shadow-2xl transform hover:scale-105 transition-all duration-300`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm font-medium mb-1">⚖️ Balance Total</p>
-                  <p className="text-3xl font-bold">
-                    {(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '+' : ''}
-                    {formatCurrency(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses)}
-                  </p>
-                  <p className="text-purple-100 text-xs mt-2">
-                    {(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '✅ Positivo' : '⚠️ Negativo'}
-                  </p>
-                </div>
-                <div className="bg-white bg-opacity-20 rounded-full p-3">
-                  <span className="text-2xl">{(dashboardMetrics.totalIncome - dashboardMetrics.totalExpenses) >= 0 ? '🎯' : '⚠️'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {groceryMetrics && (
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-              <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-                <span className="bg-gradient-to-r from-orange-400 to-red-500 rounded-full p-3 mr-4">
-                  🛒
-                </span>
-                Métricas de Supermercado
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl p-6 border border-orange-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-orange-700 text-sm font-medium mb-1">Gasto Total</p>
-                      <p className="text-3xl font-bold text-orange-800">{formatCurrency(groceryMetrics.totalSpent)}</p>
-                      <p className="text-orange-600 text-sm mt-1">Mensual: {formatCurrency(groceryMetrics.averageMonthly)}</p>
-                    </div>
-                    <div className="text-4xl">🛍️</div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-6 border border-green-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-700 text-sm font-medium mb-1">% de Ingresos</p>
-                      <p className="text-3xl font-bold text-green-800">{groceryMetrics.percentageOfIncome.toFixed(1)}%</p>
-                      <p className="text-green-600 text-sm mt-1">
-                        {groceryMetrics.percentageOfIncome < 15 ? 'Excelente' : groceryMetrics.percentageOfIncome < 25 ? 'Bueno' : 'Alto'}
-                      </p>
-                    </div>
-                    <div className="text-4xl">📊</div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 border border-blue-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-700 text-sm font-medium mb-1">Eficiencia</p>
-                      <p className="text-3xl font-bold text-blue-800">{groceryMetrics.efficiency.toFixed(1)}%</p>
-                      <p className="text-blue-600 text-sm mt-1">
-                        {groceryMetrics.efficiency > 20 ? 'Excelente' : groceryMetrics.efficiency > 0 ? 'Bueno' : 'Revisar'}
-                      </p>
-                    </div>
-                    <div className="text-4xl">⚡</div>
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 border border-purple-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-700 text-sm font-medium mb-1">Ahorro Potencial</p>
-                      <p className="text-3xl font-bold text-purple-800">{formatCurrency(Math.max(0, groceryMetrics.budgetTotal - groceryMetrics.totalSpent))}</p>
-                      <p className="text-purple-600 text-sm mt-1">vs. presupuesto</p>
-                    </div>
-                    <div className="text-4xl">💰</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
-                <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <span className="text-2xl mr-2">💡</span>
-                  Consejos para Ahorrar en el Supermercado
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start">
-                    <span className="text-lg mr-2">📝</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Planifica tus compras</p>
-                      <p className="text-sm text-gray-600">Haz una lista antes de ir al supermercado</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-lg mr-2">🏷️</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Compara precios</p>
-                      <p className="text-sm text-gray-600">Revisa ofertas y marcas genéricas</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-lg mr-2">📅</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Compra estacional</p>
-                      <p className="text-sm text-gray-600">Aprovecha frutas y verduras de temporada</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <span className="text-lg mr-2">🥫</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Compra al por mayor</p>
-                      <p className="text-sm text-gray-600">Para productos no perecederos</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <QuickActions 
+            dashboardMetrics={dashboardMetrics}
+            groceryMetrics={groceryMetrics}
+            formatCurrency={formatCurrency}
+          />
 
           {dashboardMetrics.monthlyData && (
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-              <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-                <span className="bg-gradient-to-r from-blue-400 to-purple-500 rounded-full p-3 mr-4">
-                  📊
-                </span>
-                Tendencias de los Últimos 6 Meses
-              </h3>
-              <div className="grid grid-cols-6 gap-4">
-                {dashboardMetrics.monthlyData.map((month: any, index: number) => (
-                  <div key={index} className="text-center">
-                    <div className="mb-2">
-                      <div className="text-sm font-medium text-gray-600 mb-1">{month.month}</div>
-                      <div className="relative h-40 bg-gradient-to-t from-gray-100 to-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
-                        <div 
-                          className="absolute bottom-0 left-0 w-1/2 bg-gradient-to-t from-green-500 to-green-400 rounded-tl-xl transition-all duration-1000 shadow-lg"
-                          style={{ height: `${Math.min(100, Math.max((month.income / (Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.income)) || 1)) * 100, 5))}%` }}
-                        ></div>
-                        <div 
-                          className="absolute bottom-0 right-0 w-1/2 bg-gradient-to-t from-red-500 to-red-400 rounded-tr-xl transition-all duration-1000 shadow-lg"
-                          style={{ height: `${Math.min(100, Math.max((month.expenses / (Math.max(...dashboardMetrics.monthlyData.map((m: any) => m.expenses)) || 1)) * 100, 5))}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="text-xs space-y-1">
-                      <div className="text-green-600 font-medium">{formatCurrency(month.income)}</div>
-                      <div className="text-red-600 font-medium">{formatCurrency(month.expenses)}</div>
-                      <div className={`font-bold ${month.balance >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                        {month.balance >= 0 ? '+' : ''}{formatCurrency(month.balance)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-center mt-6 space-x-8 text-sm">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-green-400 rounded mr-2 shadow"></div>
-                  <span className="text-gray-600 font-medium">Ingresos</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-red-400 rounded mr-2 shadow"></div>
-                  <span className="text-gray-600 font-medium">Gastos</span>
-                </div>
-              </div>
-            </div>
+            <TrendsSection 
+              monthlyData={dashboardMetrics.monthlyData}
+              groceryMetrics={groceryMetrics}
+              formatCurrency={formatCurrency}
+              budgets={budgets}
+              calculateSummary={calculateSummary}
+            />
           )}
           
-          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
-            <h3 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
-              <span className="bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full p-3 mr-4">
-                📰
-              </span>
-              Centro de Educación Financiera
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {educationalContent.map((content) => (
-                <div key={content.id} className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full">
-                  <div className="mb-4">
-                    {content.image_url ? (
-                      <div className="relative w-full h-32 mb-3 rounded-xl overflow-hidden">
-                        <img 
-                          src={content.image_url} 
-                          alt={content.title}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = 'flex';
-                            }
-                          }}
-                        />
-                        <div className="hidden absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 items-center justify-center">
-                          <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="w-full h-32 mb-3 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        <span className="text-4xl text-white">{content.image_emoji || '📄'}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        content.type === 'video' 
-                          ? 'bg-red-100 text-red-700' 
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {content.type === 'video' ? '📹 Video' : '📄 Artículo'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-grow">
-                    <h4 className="text-lg font-bold text-gray-800 mb-3 line-clamp-2">
-                      {content.title}
-                    </h4>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-4">
-                      {content.summary || 'Contenido educativo disponible para mejorar tus conocimientos financieros.'}
-                    </p>
-                  </div>
-                  
-                  <div className="mt-auto">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                        content.category === 'Ahorro' ? 'bg-green-100 text-green-700' :
-                        content.category === 'Presupuesto' ? 'bg-blue-100 text-blue-700' :
-                        content.category === 'Inversión' ? 'bg-purple-100 text-purple-700' :
-                        'bg-orange-100 text-orange-700'
-                      }`}>
-                        {content.category}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {content.type === 'video' ? content.duration : content.duration}
-                      </span>
-                    </div>
-                    
-                    <button onClick={() => handleContentClick(content)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105">
-                      {content.type === 'video' ? '🎥 Ver Video' : '📖 Leer Artículo'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Sección de videos destacados */}
-            <FeaturedVideos featuredContent={featuredContent} />
-          </div>
+          <EducationCenter 
+            dashboardMetrics={dashboardMetrics}
+            groceryMetrics={groceryMetrics}
+            formatCurrency={formatCurrency}
+            educationalContent={educationalContent}
+            featuredContent={featuredContent}
+            handleContentClick={handleContentClick}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">

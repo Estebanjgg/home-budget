@@ -24,6 +24,9 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
   const [summary, setSummary] = useState<any>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteItemModal, setShowDeleteItemModal] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState<BudgetItem | null>(null)
+  const [isDeletingItem, setIsDeletingItem] = useState(false)
   // Nuevo estado para el modo de vista
   const [viewMode, setViewMode] = useState<ViewMode>('normal')
 
@@ -56,13 +59,25 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
     }
   }
 
-  const handleDeleteItem = async (id: string) => {
-    // Para simplificar, he quitado la confirmación, puedes volver a añadirla si quieres.
+  const handleDeleteItem = (item: BudgetItem) => {
+    setItemToDelete(item)
+    setShowDeleteItemModal(true)
+  }
+
+  const confirmDeleteItem = async () => {
+    if (!itemToDelete) return
+    
+    setIsDeletingItem(true)
     try {
-      await removeItem(id)
+      await removeItem(itemToDelete.id)
+      setShowDeleteItemModal(false)
+      setItemToDelete(null)
       loadSummary()
     } catch (error) {
       console.error('Error deleting item:', error)
+      alert('Error al eliminar el elemento. Por favor, inténtalo de nuevo.')
+    } finally {
+      setIsDeletingItem(false)
     }
   }
 
@@ -152,7 +167,7 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                       ✏️
                     </button>
                     <button
-                      onClick={() => handleDeleteItem(item.id)}
+                      onClick={() => handleDeleteItem(item)}
                       className="text-red-600 hover:text-red-800 text-xs"
                     >
                       🗑️
@@ -211,7 +226,7 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                       ✏️
                     </button>
                     <button
-                      onClick={() => handleDeleteItem(item.id)}
+                      onClick={() => handleDeleteItem(item)}
                       className="text-red-600 hover:text-red-800"
                     >
                       🗑️
@@ -271,7 +286,7 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                     ✏️
                   </button>
                   <button
-                    onClick={() => handleDeleteItem(item.id)}
+                    onClick={() => handleDeleteItem(item)}
                     className="text-red-600 hover:text-red-800 text-sm"
                   >
                     🗑️
@@ -436,7 +451,7 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                           ✏️
                         </button>
                         <button
-                          onClick={() => handleDeleteItem(item.id)}
+                          onClick={() => handleDeleteItem(item)}
                           className="text-red-600 hover:text-red-800 text-sm"
                         >
                           🗑️
@@ -533,10 +548,23 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl border-2 border-red-500 max-w-md w-full mx-4 transform transition-all">
             <div className="bg-red-50 rounded-t-2xl p-6 border-b border-red-100">
-               {/* ... contenido del modal ... */}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-red-800">Confirmar Eliminación</h3>
+                  <p className="text-red-600">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
             </div>
             <div className="p-6">
-               {/* ... contenido del modal ... */}
+              <p className="text-gray-700 mb-4">
+                ¿Estás seguro de que deseas eliminar el presupuesto <strong>"{budget.name}"</strong>?
+              </p>
+              <p className="text-gray-600 text-sm">
+                Se eliminarán todos los ingresos y gastos asociados a este presupuesto.
+              </p>
             </div>
             <div className="bg-gray-50 rounded-b-2xl p-6 flex gap-3">
               <button
@@ -552,6 +580,52 @@ export function BudgetDetail({ budget, onBack, onDelete }: BudgetDetailProps) {
                 className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isDeleting ? 'Eliminando...' : 'Sí, eliminar presupuesto'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación de item */}
+      {showDeleteItemModal && itemToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border-2 border-red-500 max-w-md w-full mx-4 transform transition-all">
+            <div className="bg-red-50 rounded-t-2xl p-6 border-b border-red-100">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-2xl">⚠️</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-red-800">Confirmar Eliminación</h3>
+                  <p className="text-red-600">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 mb-4">
+                ¿Estás seguro de que deseas eliminar el {itemToDelete.type === 'income' ? 'ingreso' : 'gasto'} <strong>"{itemToDelete.description}"</strong>?
+              </p>
+              <p className="text-gray-600 text-sm">
+                Monto: <span className="font-semibold">{formatCurrency(itemToDelete.estimated_amount)}</span>
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-b-2xl p-6 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteItemModal(false)
+                  setItemToDelete(null)
+                }}
+                disabled={isDeletingItem}
+                className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDeleteItem}
+                disabled={isDeletingItem}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeletingItem ? 'Eliminando...' : `Sí, eliminar ${itemToDelete.type === 'income' ? 'ingreso' : 'gasto'}`}
               </button>
             </div>
           </div>

@@ -7,7 +7,7 @@ interface SwipeGestureOptions {
   onSwipeDown?: () => void;
   threshold?: number; // Distancia mínima para considerar un swipe
   preventDefaultTouchmoveEvent?: boolean;
-  element?: HTMLElement | null; // Elemento opcional para aplicar los gestos
+  element?: HTMLDivElement | null; // Elemento opcional para aplicar los gestos
 }
 
 interface TouchPosition {
@@ -28,7 +28,7 @@ export const useSwipeGestures = (options: SwipeGestureOptions) => {
 
   const [touchStart, setTouchStart] = useState<TouchPosition | null>(null);
   const [touchEnd, setTouchEnd] = useState<TouchPosition | null>(null);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const minSwipeDistance = threshold;
 

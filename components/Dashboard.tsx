@@ -17,7 +17,7 @@ import { SmartAlerts } from './dashboard/SmartAlerts'
 import { FinancialAssistant } from './ai/FinancialAssistant'
 import { Toaster } from 'react-hot-toast'
 import PWAInstaller from './PWAInstaller'
-import { useSwipeGestures } from '../hooks/useSwipeGestures'
+
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -68,7 +68,7 @@ export function Dashboard() {
   const [currentBudgetItems, setCurrentBudgetItems] = useState<BudgetItem[]>([])
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
+
   
   // Get current month budget for FinancialAssistant
   const currentDate = new Date()
@@ -233,12 +233,58 @@ export function Dashboard() {
     setCurrentSectionIndex(prev => Math.max(prev - 1, 0))
   }, [])
 
-  // Use swipe gestures hook
-  useSwipeGestures({
-    onSwipeLeft: handleSwipeLeft,
-    onSwipeRight: handleSwipeRight,
-    element: containerRef.current
-  })
+  // Swipe gesture implementation
+  const swipeRef = useRef<HTMLDivElement>(null)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    const element = swipeRef.current
+    if (!element) return
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      }
+      console.log('Touch start:', touchStartRef.current)
+    }
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!touchStartRef.current) return
+
+      const touchEnd = {
+        x: e.changedTouches[0].clientX,
+        y: e.changedTouches[0].clientY
+      }
+
+      const deltaX = touchStartRef.current.x - touchEnd.x
+      const deltaY = touchStartRef.current.y - touchEnd.y
+      const minSwipeDistance = 50
+
+      // Solo procesar swipes horizontales
+      console.log('Touch end - deltaX:', deltaX, 'deltaY:', deltaY)
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+        console.log('Swipe detected:', deltaX > 0 ? 'left' : 'right')
+        if (deltaX > 0) {
+          // Swipe left (next section)
+          handleSwipeLeft()
+        } else {
+          // Swipe right (previous section)
+          handleSwipeRight()
+        }
+      }
+
+      touchStartRef.current = null
+    }
+
+    element.addEventListener('touchstart', handleTouchStart, { passive: true })
+    element.addEventListener('touchend', handleTouchEnd, { passive: true })
+
+    return () => {
+      element.removeEventListener('touchstart', handleTouchStart)
+      element.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [handleSwipeLeft, handleSwipeRight])
 
   // Memoize formatCurrency to prevent re-creation
   const formatCurrency = useCallback((amount: number) => {
@@ -511,7 +557,7 @@ export function Dashboard() {
   }
 
   return (
-    <div ref={containerRef} className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
+    <div ref={swipeRef} className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
       <PWAInstaller />
       {showAdminPanel && (
         <EducationAdmin onClose={() => setShowAdminPanel(false)} />
@@ -574,60 +620,46 @@ export function Dashboard() {
                 <button
                   key={index}
                   onClick={() => setCurrentSectionIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  className={`w-4 h-4 rounded-full transition-all duration-300 ${
                     index === currentSectionIndex 
-                      ? 'bg-blue-500 w-6' 
-                      : 'bg-gray-300'
+                      ? 'bg-blue-600 scale-125 shadow-lg' 
+                      : 'bg-gray-300 hover:bg-gray-400'
                   }`}
+                  aria-label={`Ir a sección ${index + 1}`}
                 />
               ))}
             </div>
+            
+            {/* Instrucciones de deslizamiento con botones */}
+            <div className="text-center mt-4 bg-blue-50 rounded-lg p-3 border border-blue-200">
+              <p className="text-sm text-blue-700 font-medium">
+                👆 Desliza horizontalmente para navegar entre secciones
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Sección {currentSectionIndex + 1} de {sections.length}
+              </p>
+              
+              {/* Botones de navegación manual */}
+              <div className="flex justify-center space-x-4 mt-3">
+                <button
+                  onClick={handleSwipeRight}
+                  disabled={currentSectionIndex === 0}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+                >
+                  ← Anterior
+                </button>
+                <button
+                  onClick={handleSwipeLeft}
+                  disabled={currentSectionIndex === sections.length - 1}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Navigation Controls for Mobile */}
-          <div className="md:hidden mb-4">
-            {/* Swipe Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 text-center">
-              <p className="text-sm text-blue-700">
-                👈 Desliza para navegar entre secciones 👉
-              </p>
-            </div>
-            
-            {/* Navigation Buttons */}
-            <div className="flex justify-between items-center">
-              <button
-                onClick={() => setCurrentSectionIndex(prev => Math.max(prev - 1, 0))}
-                disabled={currentSectionIndex === 0}
-                className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                  currentSectionIndex === 0
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
-                }`}
-              >
-                <span className="mr-2">←</span>
-                Anterior
-              </button>
-              
-              <div className="text-center">
-                <span className="text-sm text-gray-500 font-medium">
-                  {currentSectionIndex + 1} / {sections.length}
-                </span>
-              </div>
-              
-              <button
-                onClick={() => setCurrentSectionIndex(prev => Math.min(prev + 1, sections.length - 1))}
-                disabled={currentSectionIndex === sections.length - 1}
-                className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                  currentSectionIndex === sections.length - 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
-                }`}
-              >
-                Siguiente
-                <span className="ml-2">→</span>
-              </button>
-            </div>
-          </div>
+
 
           {/* Desktop: Show all sections */}
           <div className="hidden md:block space-y-8">

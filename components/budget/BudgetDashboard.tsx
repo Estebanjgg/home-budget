@@ -6,7 +6,7 @@ import { useBudgetItems } from '@/hooks/useBudgetItems'
 import { BudgetList } from './BudgetList'
 import { BudgetForm } from './BudgetForm'
 import { BudgetDetail } from './BudgetDetail'
-import { FinancialAssistant } from '../ai/FinancialAssistant'
+import { LazyFinancialAssistant } from '../LazyComponents'
 import type { Budget, BudgetSummary, BudgetItem, ExpenseCategory } from '@/lib/types'
 
 export function BudgetDashboard() {
@@ -224,7 +224,7 @@ export function BudgetDashboard() {
 
               {/* Asistente Financiero IA */}
               <div className="mb-8">
-                <FinancialAssistant 
+                <LazyFinancialAssistant 
                   budgets={budgets} 
                   currentBudgetItems={currentBudgetItems}
                   categories={categories}

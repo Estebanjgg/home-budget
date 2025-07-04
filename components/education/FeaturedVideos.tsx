@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { VideoPlayer } from './VideoPlayer'
+import { LazyVideoPlayer } from '../LazyComponents'
 import type { EducationalContent } from '@/lib/types'
 
 interface FeaturedVideosProps {
@@ -132,7 +132,7 @@ export function FeaturedVideos({ featuredContent }: FeaturedVideosProps) {
       </div>
       
       {selectedVideo && (
-        <VideoPlayer
+        <LazyVideoPlayer
           url={selectedVideo.url!}
           title={selectedVideo.title}
           onClose={() => setSelectedVideo(null)}

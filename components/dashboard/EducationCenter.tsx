@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { FeaturedVideos } from './../education/FeaturedVideos'
+import { LazyFeaturedVideos } from '../LazyComponents'
 import type { EducationalContent } from '@/lib/types'
 
 interface DashboardMetrics {
@@ -292,9 +292,9 @@ export function EducationCenter({
       
       {/* Videos Educativos Destacados */}
       <div className="mb-8">
-        <FeaturedVideos 
-          featuredContent={featuredContent}
-        />
+        <LazyFeaturedVideos
+                featuredContent={featuredContent}
+              />
       </div>
 
       {/* Controles de Vista y Paginación */}

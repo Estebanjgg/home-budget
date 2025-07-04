@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 import { EducationalContent } from '@/lib/types'
 import { MarkdownRenderer } from './MarkdownRenderer'
-import { VideoPlayer } from './VideoPlayer'
+import { LazyVideoPlayer } from '../LazyComponents'
 import { supabase } from '@/lib/config/supabase' 
 
 interface EducationAdminProps {
@@ -815,7 +815,7 @@ export function EducationAdmin({ onClose }: EducationAdminProps) {
       </div>
       
       {previewVideo && (
-        <VideoPlayer
+        <LazyVideoPlayer
           url={previewVideo}
           title="Vista Previa del Video"
           onClose={() => setPreviewVideo(null)}

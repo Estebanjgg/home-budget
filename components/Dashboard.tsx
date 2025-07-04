@@ -3,20 +3,22 @@ import { useBudgets } from '@/hooks/useBudgets'
 import { useBudgetItems } from '@/hooks/useBudgetItems'
 import { useEducationalContent } from '@/hooks/useEducationalContent'
 import { getBudgetItems } from '@/lib/budget-queries'
-import { EducationAdmin } from './education/EducationAdmin'
-import { FeaturedVideos } from './education/FeaturedVideos'
-import { VideoPlayer } from './education/VideoPlayer'
-import { ArticleViewer } from './education/ArticleViewer'
-import { TrendsSection } from './trends/TrendsSection'
 import { MetricsOverview } from './dashboard/MetricsOverview'
-import { FinancialHealthIndicators } from './dashboard/FinancialHealthIndicators'
 import { QuickActions } from './dashboard/QuickActions'
-import { EducationCenter } from './dashboard/EducationCenter'
-import { AdvancedCharts } from './dashboard/AdvancedCharts'
-import { SmartAlerts } from './dashboard/SmartAlerts'
-import { FinancialAssistant } from './ai/FinancialAssistant'
 import { Toaster } from 'react-hot-toast'
 import PWAInstaller from './PWAInstaller'
+import {
+  LazyAdvancedCharts,
+  LazyFinancialHealthIndicators,
+  LazyEducationCenter,
+  LazySmartAlerts,
+  LazyTrendsSection,
+  LazyFinancialAssistant,
+  LazyEducationAdmin,
+  LazyVideoPlayer,
+  LazyArticleViewer,
+  LazyFeaturedVideos
+} from './LazyComponents'
 
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
@@ -331,7 +333,7 @@ export function Dashboard() {
     return (
       <div className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
         {showAdminPanel && (
-          <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+          <LazyEducationAdmin onClose={() => setShowAdminPanel(false)} />
         )}
 
         {/* Sección de Bienvenida para Usuarios Nuevos */}
@@ -497,7 +499,7 @@ export function Dashboard() {
           </div>
           
           {/* Sección de videos destacados para usuarios nuevos */}
-          <FeaturedVideos featuredContent={featuredContent} />
+          <LazyFeaturedVideos featuredContent={featuredContent} />
         </div>
 
         {/* Consejos Rápidos para Empezar */}
@@ -538,19 +540,19 @@ export function Dashboard() {
 
         {/* Renderizado condicional del VideoPlayer */}
         {selectedVideo && (
-          <VideoPlayer
-            url={selectedVideo.url!}
-            title={selectedVideo.title}
-            onClose={() => setSelectedVideo(null)}
-          />
+          <LazyVideoPlayer
+                  url={selectedVideo.url!}
+                  title={selectedVideo.title}
+                  onClose={() => setSelectedVideo(null)}
+                />
         )}
 
         {/* Renderizado condicional del ArticleViewer */}
         {selectedArticle && (
-          <ArticleViewer
-            article={selectedArticle}
-            onClose={() => setSelectedArticle(null)}
-          />
+          <LazyArticleViewer
+                  article={selectedArticle}
+                  onClose={() => setSelectedArticle(null)}
+                />
         )}
       </div>
     )
@@ -560,7 +562,7 @@ export function Dashboard() {
     <div ref={swipeRef} className="space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen p-6">
       <PWAInstaller />
       {showAdminPanel && (
-        <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+        <LazyEducationAdmin onClose={() => setShowAdminPanel(false)} />
       )}
 
       <div className="text-center bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
@@ -669,13 +671,13 @@ export function Dashboard() {
               formatCurrency={formatCurrency}
             />
 
-            <FinancialHealthIndicators 
+            <LazyFinancialHealthIndicators 
               dashboardMetrics={dashboardMetrics}
               groceryMetrics={groceryMetrics}
               formatCurrency={formatCurrency}
             />
 
-            <SmartAlerts
+            <LazySmartAlerts
               monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
               monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
               budgetLimits={budgetLimits}
@@ -689,13 +691,13 @@ export function Dashboard() {
               formatCurrency={formatCurrency}
             />
 
-            <AdvancedCharts
+            <LazyAdvancedCharts
               monthlyData={dashboardMetrics.monthlyData || []}
               formatCurrency={formatCurrency}
             />
 
             {dashboardMetrics.monthlyData && (
-              <TrendsSection 
+              <LazyTrendsSection 
                 monthlyData={dashboardMetrics.monthlyData}
                 groceryMetrics={groceryMetrics}
                 formatCurrency={formatCurrency}
@@ -704,14 +706,14 @@ export function Dashboard() {
               />
             )}
             
-            <FinancialAssistant 
+            <LazyFinancialAssistant 
               budgets={budgets}
               currentBudgetItems={currentBudgetItems}
               categories={categories}
               formatCurrency={formatCurrency}
             />
 
-            <EducationCenter 
+            <LazyEducationCenter 
               dashboardMetrics={dashboardMetrics}
               groceryMetrics={groceryMetrics}
               formatCurrency={formatCurrency}
@@ -732,7 +734,7 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 1 && (
-              <FinancialHealthIndicators 
+              <LazyFinancialHealthIndicators 
                 dashboardMetrics={dashboardMetrics}
                 groceryMetrics={groceryMetrics}
                 formatCurrency={formatCurrency}
@@ -740,7 +742,7 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 2 && (
-              <SmartAlerts
+              <LazySmartAlerts
                 monthlyIncome={dashboardMetrics.averageMonthlyIncome || 0}
                 monthlyExpenses={dashboardMetrics.averageMonthlyExpenses || 0}
                 budgetLimits={budgetLimits}
@@ -758,14 +760,14 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 4 && (
-              <AdvancedCharts
+              <LazyAdvancedCharts
                 monthlyData={dashboardMetrics.monthlyData || []}
                 formatCurrency={formatCurrency}
               />
             )}
             
             {currentSectionIndex === 5 && dashboardMetrics.monthlyData && (
-              <TrendsSection 
+              <LazyTrendsSection 
                 monthlyData={dashboardMetrics.monthlyData}
                 groceryMetrics={groceryMetrics}
                 formatCurrency={formatCurrency}
@@ -775,7 +777,7 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 6 && (
-              <FinancialAssistant 
+              <LazyFinancialAssistant 
                 budgets={budgets}
                 currentBudgetItems={currentBudgetItems}
                 categories={categories}
@@ -784,7 +786,7 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 7 && (
-              <EducationCenter 
+              <LazyEducationCenter 
                 dashboardMetrics={dashboardMetrics}
                 groceryMetrics={groceryMetrics}
                 formatCurrency={formatCurrency}
@@ -958,7 +960,7 @@ export function Dashboard() {
 
       {/* Renderizado condicional del VideoPlayer */}
       {selectedVideo && (
-        <VideoPlayer
+        <LazyVideoPlayer
           url={selectedVideo.url!}
           title={selectedVideo.title}
           onClose={() => setSelectedVideo(null)}
@@ -967,7 +969,7 @@ export function Dashboard() {
 
       {/* Renderizado condicional del ArticleViewer */}
       {selectedArticle && (
-        <ArticleViewer
+        <LazyArticleViewer
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
         />

@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import Auth from '@/components/auth/Auth'
-import UserProfile from '@/components/user/UserProfile'
 import { Navbar } from '@/components/layout/Navbar'
 import { Dashboard } from '@/components/Dashboard'
-import { BudgetManager } from '@/components/budget/BudgetManager'
 import { Footer } from '../components/layout/Footer'
-import GroceryManager from '@/components/grocery/GroceryManager'
-import { EducationAdmin } from '@/components/education/EducationAdmin'
 import { getAssetPath } from '@/lib/utils'
+import {
+  LazyBudgetManager,
+  LazyGroceryManager,
+  LazyEducationAdmin,
+  LazyUserProfile
+} from '@/components/LazyComponents'
 
 
 export default function Home() {
@@ -110,7 +112,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Renderizar EducationAdmin si está activo */}
       {showAdminPanel && (
-        <EducationAdmin onClose={() => setShowAdminPanel(false)} />
+        <LazyEducationAdmin onClose={() => setShowAdminPanel(false)} />
       )}
 
       {/* Navbar unificado que incluye la funcionalidad de Navigation.tsx */}
@@ -155,16 +157,16 @@ export default function Home() {
       {!showAdminPanel && (
         <main className="max-w-[95%] xl:max-w-[90%] 2xl:max-w-[85%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {showProfile ? (
-            <UserProfile 
+            <LazyUserProfile 
               user={user} 
               onClose={() => setShowProfile(false)}
             />
           ) : activeTab === 'dashboard' ? (
             <Dashboard />
           ) : activeTab === 'budgets' ? (
-            <BudgetManager />
+            <LazyBudgetManager />
           ) : activeTab === 'grocery' ? (
-            <GroceryManager onBack={() => setActiveTab('dashboard')} />
+            <LazyGroceryManager onBack={() => setActiveTab('dashboard')} />
           ) : null}
         </main>
       )}

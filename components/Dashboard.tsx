@@ -20,7 +20,7 @@ import {
   LazyFeaturedVideos
 } from './LazyComponents'
 import { InteractiveCharts } from './charts'
-
+import { CurrencyWidget } from './currency/CurrencyConverter'
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
 
@@ -682,11 +682,21 @@ export function Dashboard() {
 
           {/* Desktop: Show all sections */}
           <div className="hidden md:block space-y-8">
-            <MetricsOverview 
-              dashboardMetrics={dashboardMetrics}
-              groceryMetrics={groceryMetrics}
-              formatCurrency={formatCurrency}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-3">
+                <MetricsOverview 
+                  dashboardMetrics={dashboardMetrics}
+                  groceryMetrics={groceryMetrics}
+                  formatCurrency={formatCurrency}
+                />
+              </div>
+              <div className="lg:col-span-1">
+                <CurrencyWidget 
+                  amount={dashboardMetrics.averageMonthlyIncome || 1000}
+                  baseCurrency="USD"
+                />
+              </div>
+            </div>
 
             <LazyFinancialHealthIndicators 
               dashboardMetrics={dashboardMetrics}
@@ -753,11 +763,17 @@ export function Dashboard() {
           {/* Mobile: Show current section only */}
           <div className="md:hidden">
             {currentSectionIndex === 0 && (
-              <MetricsOverview 
-                dashboardMetrics={dashboardMetrics}
-                groceryMetrics={groceryMetrics}
-                formatCurrency={formatCurrency}
-              />
+              <div className="space-y-6">
+                <MetricsOverview 
+                  dashboardMetrics={dashboardMetrics}
+                  groceryMetrics={groceryMetrics}
+                  formatCurrency={formatCurrency}
+                />
+                <CurrencyWidget 
+                  amount={dashboardMetrics.averageMonthlyIncome || 1000}
+                  baseCurrency="USD"
+                />
+              </div>
             )}
             
             {currentSectionIndex === 1 && (

@@ -13,18 +13,19 @@ import {
   LazyEducationAdmin,
   LazyUserProfile
 } from '@/components/LazyComponents'
+import { CurrencyConverter } from '@/components/currency/CurrencyConverter'
 
 
 export default function Home() {
   const { user, loading } = useAuth()
   const [showProfile, setShowProfile] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets' | 'grocery'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'budgets' | 'grocery' | 'currency'>('dashboard')
 
   // Escuchar eventos de cambio de tab desde el Dashboard
   useEffect(() => {
     const handleTabChange = (event: CustomEvent) => {
-      setActiveTab(event.detail as 'dashboard' | 'budgets' | 'grocery')
+      setActiveTab(event.detail as 'dashboard' | 'budgets' | 'grocery' | 'currency')
     }
 
     window.addEventListener('changeTab', handleTabChange as EventListener)
@@ -167,6 +168,8 @@ export default function Home() {
             <LazyBudgetManager />
           ) : activeTab === 'grocery' ? (
             <LazyGroceryManager onBack={() => setActiveTab('dashboard')} />
+          ) : activeTab === 'currency' ? (
+            <CurrencyConverter />
           ) : null}
         </main>
       )}

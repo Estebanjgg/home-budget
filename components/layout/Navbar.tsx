@@ -2,11 +2,12 @@ import { useState } from 'react'
 import UserMenu from './UserMenu'
 import type { User } from '@supabase/supabase-js'
 import { getAssetPath } from '@/lib/utils'
+import Link from 'next/link'
 
 interface NavbarProps {
   user: User
-  activeTab: 'dashboard' | 'budgets' | 'grocery'
-  onTabChange: (tab: 'dashboard' | 'budgets' | 'grocery') => void
+  activeTab: 'dashboard' | 'budgets' | 'grocery' | 'currency'
+  onTabChange: (tab: 'dashboard' | 'budgets' | 'grocery' | 'currency') => void
   onProfileClick: () => void
   onAdminClick?: () => void
 }
@@ -78,15 +79,40 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminCl
             </button>
             <button
               onClick={() => onTabChange('grocery')}
-              className={`px-3 py-2 sm:px-6 sm:py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
+              className={`relative px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 ${
                 activeTab === 'grocery'
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                  : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:from-purple-100 hover:to-pink-100 hover:text-purple-700'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30'
+                  : 'bg-white/70 text-gray-600 hover:bg-white hover:text-purple-600 hover:shadow-md border border-gray-200/50'
               }`}
             >
-              <span className="hidden sm:inline">🛒 Mis Gastos Supermercado</span>
-              <span className="sm:hidden">🛒 Supermercado</span>
+              <span className="flex items-center space-x-2">
+                <span className="text-base">🛒</span>
+                <span className="hidden lg:inline">Mis Gastos Supermercado</span>
+                <span className="lg:hidden">Supermercado</span>
+              </span>
+              {activeTab === 'grocery' && (
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl opacity-20 animate-pulse"></div>
+              )}
             </button>
+            
+            <Link href="/currency">
+              <button
+                className={`relative px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 ${
+                  activeTab === 'currency'
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30'
+                    : 'bg-white/70 text-gray-600 hover:bg-white hover:text-orange-600 hover:shadow-md border border-gray-200/50'
+                }`}
+              >
+                <span className="flex items-center space-x-2">
+                  <span className="text-base">🌍</span>
+                  <span className="hidden lg:inline">Conversor de Monedas</span>
+                  <span className="lg:hidden">Monedas</span>
+                </span>
+                {activeTab === 'currency' && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl opacity-20 animate-pulse"></div>
+                )}
+              </button>
+            </Link>
           </div>
           
           {/* UserMenu - Pegado a la derecha */}
@@ -175,7 +201,6 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminCl
                 </span>
               </button>
 
-              {/* Botón Mis Gastos Supermercado - AGREGADO */}
               <button
                 onClick={() => {
                   onTabChange('grocery')
@@ -192,6 +217,22 @@ export function Navbar({ user, activeTab, onTabChange, onProfileClick, onAdminCl
                   <span>Mis Gastos Supermercado</span>
                 </span>
               </button>
+
+              <Link href="/currency">
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                    activeTab === 'currency'
+                      ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg'
+                      : 'bg-white/70 text-gray-600 hover:bg-white hover:text-orange-600 border border-gray-200/50'
+                  }`}
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span className="text-base">🌍</span>
+                    <span>Conversor de Monedas</span>
+                  </span>
+                </button>
+              </Link>
 
               {/* User Menu Mobile */}
               <div className="pt-3 border-t border-gray-200 relative z-50">

@@ -19,6 +19,7 @@ import {
   LazyArticleViewer,
   LazyFeaturedVideos
 } from './LazyComponents'
+import { InteractiveCharts } from './charts'
 
 
 import type { BudgetItem, ExpenseCategory, EducationalContent } from '@/lib/types'
@@ -295,6 +296,22 @@ export function Dashboard() {
       maximumFractionDigits: 2
     }).format(amount)
   }, [])
+
+  // Transform dashboard data to chart format
+  const chartData = useMemo(() => {
+    if (!dashboardMetrics?.monthlyData) return []
+    
+    return dashboardMetrics.monthlyData.map((item: any, index: number) => ({
+      month: item.month,
+      income: item.income || 0,
+      expenses: item.expenses || 0,
+      balance: item.balance || 0,
+      savings: (item.income || 0) * 0.2, // Asumiendo 20% de ahorro objetivo
+      category: 'general',
+      isPrediction: false,
+      date: new Date(new Date().getFullYear(), new Date().getMonth() - (dashboardMetrics.monthlyData.length - 1 - index), 1).toISOString()
+    }))
+  }, [dashboardMetrics?.monthlyData])
 
   const handleContentClick = useCallback((contentItem: EducationalContentItem) => {
     if (contentItem.type === 'video' && contentItem.url) {
@@ -691,10 +708,20 @@ export function Dashboard() {
               formatCurrency={formatCurrency}
             />
 
-            <LazyAdvancedCharts
-              monthlyData={dashboardMetrics.monthlyData || []}
-              formatCurrency={formatCurrency}
-            />
+            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 flex items-center">
+                  <span className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2 mr-3">
+                    📊
+                  </span>
+                  Análisis Financiero Interactivo
+                </h3>
+              </div>
+              <InteractiveCharts 
+                data={chartData}
+                className="w-full"
+              />
+            </div>
 
             {dashboardMetrics.monthlyData && (
               <LazyTrendsSection 
@@ -760,10 +787,20 @@ export function Dashboard() {
             )}
             
             {currentSectionIndex === 4 && (
-              <LazyAdvancedCharts
-                monthlyData={dashboardMetrics.monthlyData || []}
-                formatCurrency={formatCurrency}
-              />
+              <div className="bg-white rounded-3xl shadow-2xl p-6 border border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                    <span className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2 mr-3">
+                      📊
+                    </span>
+                    Análisis Financiero
+                  </h3>
+                </div>
+                <InteractiveCharts 
+                  data={chartData}
+                  className="w-full"
+                />
+              </div>
             )}
             
             {currentSectionIndex === 5 && dashboardMetrics.monthlyData && (

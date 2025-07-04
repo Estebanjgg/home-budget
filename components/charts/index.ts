@@ -40,9 +40,10 @@ export {
   AXIS_CONFIG
 } from './constants'
 
-// Ejemplos
+// Examples
 export { DashboardExample } from './examples/DashboardExample'
 export { IntegrationExample } from './examples/IntegrationExample'
+export { DashboardIntegration } from './examples/DashboardIntegration'
 
 // Re-exportar Recharts para conveniencia
 export {
